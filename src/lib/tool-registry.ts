@@ -19,6 +19,7 @@ import {
   KeyRound,
   Paintbrush,
   BookText,
+  Lock,
 } from "lucide-react";
 
 export interface Tool {
@@ -114,6 +115,13 @@ export const tools: Tool[] = [
     href: "/tools/meta-tag-generator",
     icon: Heading1,
     category: "SEO",
+  },
+  {
+    name: "Password Generator",
+    description: "Create secure, random passwords with customizable options.",
+    href: "/tools/password-generator",
+    icon: Lock,
+    category: "Utility",
   },
 ];
 
