@@ -28,6 +28,8 @@ import {
   Ratio,
   Shrink,
   Pipette,
+  FilePlus2,
+  FileArchive,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -71,6 +73,13 @@ const toolCategories: ToolCategory[] = [
     icon: Code2,
   },
   {
+    id: "pdf-tools",
+    name: "PDF Tools",
+    slug: "pdf-tools",
+    description: "Tools for working with PDF documents.",
+    icon: FileArchive,
+  },
+  {
     id: "ai-tools",
     name: "AI Tools",
     slug: "ai-tools",
@@ -94,6 +103,20 @@ const toolCategories: ToolCategory[] = [
 ];
 
 const allTools: Tool[] = [
+  {
+    id: "pdf-merger",
+    name: "PDF Merger",
+    slug: "pdf-merger",
+    description: "Combine multiple PDF files into a single document.",
+    category: "PDF Tools",
+    categorySlug: "pdf-tools",
+    href: "/tools/pdf-merger",
+    icon: FilePlus2,
+    is_featured: true,
+    popularity_score: 96,
+    created_at: new Date("2024-08-10T10:00:00Z"),
+    last_updated: new Date("2024-08-10T10:00:00Z"),
+  },
   {
     id: "meta-tag-generator",
     name: "Meta Tag Generator",
