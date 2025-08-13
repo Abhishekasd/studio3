@@ -24,6 +24,7 @@ import {
   AudioLines,
   HeartPulse,
   Landmark,
+  Scale,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -293,6 +294,20 @@ const allTools: Tool[] = [
     popularity_score: 84,
     created_at: new Date("2024-07-30T12:00:00Z"),
     last_updated: new Date("2024-07-30T12:00:00Z"),
+  },
+  {
+    id: "unit-converter",
+    name: "Unit Converter",
+    slug: "unit-converter",
+    description: "Convert between various units of measurement like length, weight, etc.",
+    category: "Converters",
+    categorySlug: "converters",
+    href: "/tools/unit-converter",
+    icon: Scale,
+    popularity_score: 89,
+    is_featured: true,
+    created_at: new Date("2024-08-01T10:00:00Z"),
+    last_updated: new Date("2024-08-01T10:00:00Z"),
   },
 ];
 
