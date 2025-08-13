@@ -25,6 +25,7 @@ import {
   HeartPulse,
   Landmark,
   Scale,
+  Ratio,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -281,6 +282,20 @@ const allTools: Tool[] = [
     popularity_score: 91,
     created_at: new Date("2024-07-30T11:00:00Z"),
     last_updated: new Date("2024-07-30T11:00:00Z"),
+  },
+    {
+    id: "image-resizer",
+    name: "Image Resizer",
+    slug: "image-resizer",
+    description: "Easily change the dimensions of your images online.",
+    category: "Converters",
+    categorySlug: "converters",
+    href: "/tools/image-resizer",
+    icon: Ratio,
+    popularity_score: 86,
+    is_featured: true,
+    created_at: new Date("2024-08-02T10:00:00Z"),
+    last_updated: new Date("2024-08-02T10:00:00Z"),
   },
   {
     id: "color-converter",
