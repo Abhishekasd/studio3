@@ -14,6 +14,8 @@ import {
   Heading1,
   QrCode,
   ALargeSmall,
+  Link2,
+  ListRestart,
 } from "lucide-react";
 
 export interface Tool {
@@ -45,6 +47,20 @@ export const tools: Tool[] = [
     description: "Convert text between different letter cases like uppercase, lowercase, and more.",
     href: "/tools/case-converter",
     icon: ALargeSmall,
+    category: "Text",
+  },
+  {
+    name: "Slug Generator",
+    description: "Create search-engine friendly URL slugs from your text.",
+    href: "/tools/slug-generator",
+    icon: Link2,
+    category: "Text",
+  },
+    {
+    name: "Palindrome Checker",
+    description: "Check if a word, phrase, or number is a palindrome.",
+    href: "/tools/palindrome-checker",
+    icon: ListRestart,
     category: "Text",
   },
   {
