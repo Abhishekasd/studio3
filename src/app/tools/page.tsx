@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import ToolCard from "@/components/tool-card";
 import { tools as allTools, toolCategories } from "@/lib/tool-registry";
 import type { Tool } from "@/lib/tool-registry";
@@ -8,9 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
-export default function ToolsPage() {
+function ToolsPageContent() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [activeCategory, setActiveCategory] = useState<string>(categoryParam || "All");
 
   const filteredTools: Tool[] = allTools
     .filter((tool) =>
@@ -73,5 +77,13 @@ export default function ToolsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ToolsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ToolsPageContent />
+    </Suspense>
   );
 }

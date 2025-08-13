@@ -32,17 +32,19 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {toolCategories.map((category) => (
-              <Card key={category.id} className="transform hover:scale-105 transition-transform duration-300 ease-in-out shadow-lg hover:shadow-xl">
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                    <category.icon className="w-8 h-8 text-primary" />
-                    <div>
-                      <CardTitle className="text-xl font-bold">{category.name}</CardTitle>
-                      <CardDescription>{category.description}</CardDescription>
+              <Link key={category.id} href={`/tools?category=${category.name.replace(' Tools', '')}`}>
+                <Card className="h-full transform hover:scale-105 transition-transform duration-300 ease-in-out shadow-lg hover:shadow-xl">
+                  <CardHeader>
+                    <div className="flex items-center gap-4">
+                      <category.icon className="w-8 h-8 text-primary" />
+                      <div>
+                        <CardTitle className="text-xl font-bold">{category.name}</CardTitle>
+                        <CardDescription>{category.description}</CardDescription>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-              </Card>
+                  </CardHeader>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
