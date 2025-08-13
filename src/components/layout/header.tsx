@@ -1,9 +1,10 @@
+
 "use client";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/icons";
-import { LogOut, Menu } from "lucide-react";
+import { LogOut, Menu, Search } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -19,13 +20,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Input } from "../ui/input";
 
 export default function Header() {
   const { user, signOut } = useAuth();
 
   const navItems = [
-    { label: "Home", href: "/" },
     { label: "Tools", href: "/tools" },
+    { label: "AI Tools", href: "/tools?category=ai-tools" },
+    { label: "Converters", href: "/tools?category=converters" },
+    { label: "Calculators", href: "/tools?category=calculators" },
   ];
 
   const getInitials = (name: string) => {
@@ -34,11 +38,11 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm transition-all">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2">
           <Logo className="h-8 w-8 text-primary" />
-          <span className="text-xl font-bold tracking-tight">MultiToolVerse</span>
+          <span className="hidden sm:inline-block text-xl font-bold tracking-tight">MultiToolVerse</span>
         </Link>
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item) => (
@@ -51,7 +55,16 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-        <div className="hidden md:flex items-center gap-2">
+        <div className="flex flex-1 items-center justify-end gap-2">
+           <div className="relative hidden lg:block w-full max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search for a tool..."
+              className="pl-10 w-full"
+            />
+          </div>
+
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -77,57 +90,58 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <>
+            <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" asChild>
                 <Link href="/login">Log In</Link>
               </Button>
               <Button asChild>
                 <Link href="/signup">Sign Up</Link>
               </Button>
-            </>
-          )}
-        </div>
-        <Sheet>
-          <SheetTrigger asChild className="md:hidden">
-            <Button variant="outline" size="icon">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle navigation menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right">
-            <div className="flex flex-col p-6">
-              <Link href="/" className="flex items-center gap-2 mb-8">
-                <Logo className="h-8 w-8 text-primary" />
-                <span className="text-xl font-bold">MultiToolVerse</span>
-              </Link>
-              <nav className="flex flex-col gap-4 mb-8">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
-              <div className="flex flex-col gap-2">
-                 {user ? (
-                   <Button onClick={signOut}>Log Out</Button>
-                 ) : (
-                   <>
-                    <Button variant="ghost" asChild>
-                      <Link href="/login">Log In</Link>
-                    </Button>
-                    <Button asChild>
-                      <Link href="/signup">Sign Up</Link>
-                    </Button>
-                   </>
-                 )}
-              </div>
             </div>
-          </SheetContent>
-        </Sheet>
+          )}
+
+          <Sheet>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="outline" size="icon">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle navigation menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <div className="flex flex-col p-6">
+                <Link href="/" className="flex items-center gap-2 mb-8">
+                  <Logo className="h-8 w-8 text-primary" />
+                  <span className="text-xl font-bold">MultiToolVerse</span>
+                </Link>
+                <nav className="flex flex-col gap-4 mb-8">
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+                <div className="flex flex-col gap-2">
+                  {user ? (
+                    <Button onClick={signOut}>Log Out</Button>
+                  ) : (
+                    <>
+                      <Button variant="ghost" asChild>
+                        <Link href="/login">Log In</Link>
+                      </Button>
+                      <Button asChild>
+                        <Link href="/signup">Sign Up</Link>
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );
