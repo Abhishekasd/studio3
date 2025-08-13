@@ -32,6 +32,7 @@ import {
   FileArchive,
   FileText as FileWord,
   Scissors,
+  ScanText,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -105,6 +106,21 @@ const toolCategories: ToolCategory[] = [
 ];
 
 const allTools: Tool[] = [
+  {
+    id: "plagiarism-checker",
+    name: "Plagiarism Checker",
+    slug: "plagiarism-checker",
+    description: "Check text for plagiarism against online sources.",
+    category: "AI Tools",
+    categorySlug: "ai-tools",
+    href: "/tools/plagiarism-checker",
+    icon: ScanText,
+    ai_powered: true,
+    is_featured: true,
+    popularity_score: 99,
+    created_at: new Date("2024-08-14T10:00:00Z"),
+    last_updated: new Date("2024-08-14T10:00:00Z"),
+  },
   {
     id: "image-background-remover",
     name: "Image Background Remover",
