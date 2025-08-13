@@ -37,27 +37,32 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Hero Section */}
+      {/* 3D Hero Section */}
       <section className="w-full py-20 md:py-32 lg:py-40 bg-card relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
         <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tighter mb-4 font-headline">
             All-in-One <span className="text-primary">Multi-Tool</span> Hub
           </h1>
-          <p className="max-w-[700px] mx-auto text-lg md:text-xl text-muted-foreground mb-8">
-            Convert, Create, Calculate, and Play — all in one place.
+          <p className="max-w-[700px] mx-auto text-lg md:text-xl text-muted-foreground mb-12">
+            Explore our universe of tools. Convert, Create, Calculate, and Play — all in one place.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button asChild size="lg">
-              <Link href="/tools">
-                Explore Tools <ArrowRight className="ml-2 h-5 w-5" />
+          <div className="perspective-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {toolCategories.map((category) => (
+              <Link key={category.id} href={`/tools?category=${category.slug}`}>
+                 <div className="preserve-3d group">
+                    <Card className="card-hover-effect h-full bg-background/50 backdrop-blur-sm border-white/20">
+                      <CardHeader className="items-center text-center">
+                        <div className="p-3 rounded-full bg-primary/10 mb-4 border border-primary/20">
+                           <category.icon className="w-10 h-10 text-primary" />
+                        </div>
+                        <CardTitle className="text-2xl font-bold">{category.name}</CardTitle>
+                        <CardDescription className="text-base">{category.description}</CardDescription>
+                      </CardHeader>
+                    </Card>
+                 </div>
               </Link>
-            </Button>
-             <Button asChild size="lg" variant="outline">
-              <Link href="/signup">
-                Start Free
-              </Link>
-            </Button>
+            ))}
           </div>
         </div>
       </section>
@@ -88,7 +93,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* AI Tools Highlight Section */}
+       {/* AI Tools Highlight Section */}
       <section className="w-full py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="relative rounded-lg overflow-hidden bg-gradient-to-r from-gray-900 to-gray-800 p-8 md:p-12 flex flex-col justify-center items-start min-h-[300px]">
@@ -101,25 +106,6 @@ export default async function Home() {
                 Explore AI Tools <Bot className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Tool Categories Section */}
-      <section className="w-full py-16 md:py-24">
-        <div className="container mx-auto px-4 md:px-6">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 font-headline">
-            A Universe of Categories
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {toolCategories.map((category) => (
-              <Link key={category.id} href={`/tools?category=${category.slug}`}>
-                <Card className="h-full text-center p-6 transform hover:scale-105 transition-transform duration-300 ease-in-out shadow-lg hover:shadow-xl">
-                    <category.icon className="w-10 h-10 text-primary mx-auto mb-4" />
-                    <CardTitle className="text-xl font-bold">{category.name}</CardTitle>
-                </Card>
-              </Link>
-            ))}
           </div>
         </div>
       </section>

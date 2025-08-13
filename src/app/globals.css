@@ -52,3 +52,18 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* For 3D card hero section */
+.perspective-container {
+  perspective: 1000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.card-hover-effect {
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.card-hover-effect:hover {
+  transform: translateZ(40px) rotateX(5deg) rotateY(5deg);
+  box-shadow: 0px 20px 40px rgba(0,0,0,0.4);
+}
