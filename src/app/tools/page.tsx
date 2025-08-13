@@ -43,25 +43,6 @@ function ToolsPageContent() {
     .filter((tool) =>
       activeCategory === "All" ? true : tool.categorySlug === activeCategory
     );
-    
-  // A new interface to handle categorySlug
-  interface ExtendedTool extends Tool {
-    categorySlug?: string;
-  }
-  const toolsWithCategorySlug: ExtendedTool[] = allTools.map(tool => {
-      const category = toolCategories.find(c => c.name === tool.category);
-      return { ...tool, categorySlug: category?.slug };
-  });
-
-
-  const finalFilteredTools: ExtendedTool[] = toolsWithCategorySlug
-    .filter((tool) =>
-      tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tool.description.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .filter((tool) =>
-      activeCategory === "All" ? true : tool.categorySlug === activeCategory
-    );
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6">
@@ -85,7 +66,7 @@ function ToolsPageContent() {
         </div>
         <div className="flex flex-wrap justify-center gap-2">
           <Button
-            variant={activeCategory === "All" ? "default" : "outline"}
+            variant={activeCategory === "All" ? "secondary" : "outline"}
             onClick={() => setActiveCategory("All")}
           >
             All
@@ -93,7 +74,7 @@ function ToolsPageContent() {
           {toolCategories.map((category) => (
             <Button
               key={category.id}
-              variant={activeCategory === category.slug ? "default" : "outline"}
+              variant={activeCategory === category.slug ? "secondary" : "outline"}
               onClick={() => setActiveCategory(category.slug)}
             >
               <category.icon className="mr-2 h-4 w-4" />
@@ -104,12 +85,21 @@ function ToolsPageContent() {
       </div>
 
       {loading ? (
-         <div className="text-center py-16">
-          <p className="text-xl text-muted-foreground">Loading tools...</p>
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="bg-card p-4 rounded-lg space-y-3">
+              <div className="flex items-center gap-4">
+                <div className="bg-muted rounded-full h-8 w-8 animate-pulse"></div>
+                <div className="bg-muted h-6 w-1/2 animate-pulse rounded-md"></div>
+              </div>
+              <div className="bg-muted h-4 w-full animate-pulse rounded-md"></div>
+               <div className="bg-muted h-4 w-3/4 animate-pulse rounded-md"></div>
+            </div>
+          ))}
         </div>
-      ) : finalFilteredTools.length > 0 ? (
+      ) : filteredTools.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {finalFilteredTools.map((tool) => (
+          {filteredTools.map((tool) => (
             <ToolCard key={tool.href} tool={tool} />
           ))}
         </div>
