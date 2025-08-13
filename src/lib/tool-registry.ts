@@ -27,6 +27,7 @@ import {
   Scale,
   Ratio,
   Shrink,
+  Pipette,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -324,6 +325,20 @@ const allTools: Tool[] = [
     popularity_score: 84,
     created_at: new Date("2024-07-30T12:00:00Z"),
     last_updated: new Date("2024-07-30T12:00:00Z"),
+  },
+  {
+    id: "color-picker",
+    name: "Color Picker",
+    slug: "color-picker",
+    description: "Select colors from a visual picker and get their codes.",
+    category: "Converters",
+    categorySlug: "converters",
+    href: "/tools/color-picker",
+    icon: Pipette,
+    popularity_score: 83,
+    is_featured: false,
+    created_at: new Date("2024-08-05T10:00:00Z"),
+    last_updated: new Date("2024-08-05T10:00:00Z"),
   },
   {
     id: "unit-converter",
