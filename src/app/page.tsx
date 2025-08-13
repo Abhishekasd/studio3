@@ -89,12 +89,13 @@ export default async function Home() {
       </section>
 
       {/* AI Tools Highlight Section */}
-      <section className="w-full py-16 md:py-24 bg-card">
+      <section className="w-full py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8 bg-primary/10 p-8 rounded-lg">
-            <div className="text-center md:text-left">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 font-headline text-primary">Discover Our AI-Powered Tools</h2>
-              <p className="max-w-[600px] text-muted-foreground md:text-lg mb-6">
+          <div className="relative rounded-lg overflow-hidden">
+            <Image src="https://placehold.co/1200x400.png" data-ai-hint="artificial intelligence technology" alt="AI Tools Banner" width={1200} height={400} className="w-full h-auto object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30 p-8 md:p-12 flex flex-col justify-center items-start">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 font-headline text-white">Discover Our AI-Powered Tools</h2>
+              <p className="max-w-lg text-white/80 md:text-lg mb-6">
                 Supercharge your productivity with our suite of AI tools, from the AI Meta Tag Generator to our upcoming AI Resume Builder.
               </p>
               <Button asChild size="lg" variant="secondary">
@@ -103,7 +104,6 @@ export default async function Home() {
                 </Link>
               </Button>
             </div>
-            <Image src="https://placehold.co/400x300.png" data-ai-hint="artificial intelligence technology" alt="AI Tools" width={400} height={300} className="rounded-lg shadow-lg" />
           </div>
         </div>
       </section>
