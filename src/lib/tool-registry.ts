@@ -22,6 +22,7 @@ import {
   BookText,
   Lock,
   Bot,
+  AudioLines
 } from "lucide-react";
 import { collection, getDocs, orderBy, query, Timestamp } from "firebase/firestore";
 import { db } from "./firebase";
@@ -50,6 +51,7 @@ const iconMap: { [key: string]: LucideIcon } = {
   BookText,
   Lock,
   Bot,
+  AudioLines,
   // Add other icons here as needed
 };
 
@@ -106,7 +108,7 @@ export async function getTools(): Promise<Tool[]> {
         description: data.description || "",
         category: data.category || "General",
         categorySlug: categorySlugMap.get(data.category) || "general",
-        href: data.route || `/${data.slug}`,
+        href: data.route || `/tools/${data.slug}`,
         icon: iconMap[data.icon_name] || Wrench, // Fallback to a default icon
         ai_powered: data.ai_powered || false,
         is_featured: data.is_featured || false,
