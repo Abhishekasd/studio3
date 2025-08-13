@@ -30,6 +30,7 @@ import {
   Pipette,
   FilePlus2,
   FileArchive,
+  FileText as FileWord,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -103,6 +104,20 @@ const toolCategories: ToolCategory[] = [
 ];
 
 const allTools: Tool[] = [
+  {
+    id: "word-to-pdf",
+    name: "Word to PDF",
+    slug: "word-to-pdf",
+    description: "Convert Microsoft Word (.docx) files to PDF.",
+    category: "PDF Tools",
+    categorySlug: "pdf-tools",
+    href: "/tools/word-to-pdf",
+    icon: FileWord,
+    is_featured: true,
+    popularity_score: 97,
+    created_at: new Date("2024-08-11T10:00:00Z"),
+    last_updated: new Date("2024-08-11T10:00:00Z"),
+  },
   {
     id: "pdf-merger",
     name: "PDF Merger",
