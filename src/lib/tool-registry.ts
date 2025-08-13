@@ -12,6 +12,8 @@ import {
   Code2,
   Type,
   Heading1,
+  QrCode,
+  ALargeSmall,
 } from "lucide-react";
 
 export interface Tool {
@@ -39,10 +41,24 @@ export const tools: Tool[] = [
     category: "Text",
   },
   {
+    name: "Case Converter",
+    description: "Convert text between different letter cases like uppercase, lowercase, and more.",
+    href: "/tools/case-converter",
+    icon: ALargeSmall,
+    category: "Text",
+  },
+  {
     name: "Image Converter",
     description: "Convert images from PNG to JPG format quickly and easily.",
     href: "/tools/image-converter",
     icon: FileImage,
+    category: "Image",
+  },
+  {
+    name: "QR Code Generator",
+    description: "Create QR codes for URLs, text, and other data instantly.",
+    href: "/tools/qr-code-generator",
+    icon: QrCode,
     category: "Image",
   },
   {
