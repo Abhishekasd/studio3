@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { getTools, getToolCategories, Tool } from "@/lib/tool-registry";
-import { ArrowRight, Star, Bot } from "lucide-react";
+import { ArrowRight, Star, Bot, FileImage } from "lucide-react";
 import Image from "next/image";
 
 export default async function Home() {
@@ -34,6 +34,9 @@ export default async function Home() {
       avatar: "https://placehold.co/100x100.png"
     }
   ];
+  
+   const heroCategories = toolCategories.filter(c => ["text-tools", "developer-tools", "converters", "calculators", "ai-tools", "pdf-tools"].includes(c.slug));
+
 
   return (
     <div className="flex flex-col items-center">
@@ -48,7 +51,7 @@ export default async function Home() {
             Explore our universe of tools. Convert, Create, Calculate, and Play — all in one place.
           </p>
           <div className="perspective-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {toolCategories.map((category) => (
+            {heroCategories.map((category) => (
               <Link key={category.id} href={`/tools?category=${category.slug}`}>
                  <div className="preserve-3d group">
                     <Card className="card-hover-effect h-full bg-background/50 backdrop-blur-sm border-white/20">
