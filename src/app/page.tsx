@@ -91,19 +91,16 @@ export default async function Home() {
       {/* AI Tools Highlight Section */}
       <section className="w-full py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="relative rounded-lg overflow-hidden">
-            <Image src="https://placehold.co/1200x400.png" data-ai-hint="artificial intelligence technology" alt="AI Tools Banner" width={1200} height={400} className="w-full h-auto object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30 p-8 md:p-12 flex flex-col justify-center items-start">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 font-headline text-white">Discover Our AI-Powered Tools</h2>
-              <p className="max-w-lg text-white/80 md:text-lg mb-6">
-                Supercharge your productivity with our suite of AI tools, from the AI Meta Tag Generator to our upcoming AI Resume Builder.
-              </p>
-              <Button asChild size="lg" variant="secondary">
-                <Link href="/tools?category=ai-tools">
-                  Explore AI Tools <Bot className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </div>
+          <div className="relative rounded-lg overflow-hidden bg-gradient-to-r from-gray-900 to-gray-800 p-8 md:p-12 flex flex-col justify-center items-start min-h-[300px]">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 font-headline text-white">Discover Our AI-Powered Tools</h2>
+            <p className="max-w-lg text-white/80 md:text-lg mb-6">
+              Supercharge your productivity with our suite of AI tools, from the AI Meta Tag Generator to our upcoming AI Resume Builder.
+            </p>
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/tools?category=ai-tools">
+                Explore AI Tools <Bot className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
