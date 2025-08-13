@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, Trash2 } from "lucide-react";
 
-type CaseType = "lowercase" | "UPPERCASE" | "Sentence case" | "Title Case" | "camelCase" | "PascalCase" | "snake_case" | "kebab-case";
+type CaseType = "lowercase" | "UPPERCASE" | "Sentence case" | "Title Case" | "camelCase" | "PascalCase" | "snake_case" | "kebab-case" | "Reverse Text";
 
 export default function CaseConverterPage() {
   const [inputText, setInputText] = useState('');
@@ -64,6 +64,9 @@ export default function CaseConverterPage() {
       case 'kebab-case':
         result = toKebabCase(inputText);
         break;
+      case 'Reverse Text':
+        result = inputText.split('').reverse().join('');
+        break;
     }
     setOutputText(result);
     toast({ title: "Text Converted!", description: `Successfully converted to ${caseType}.` });
@@ -80,7 +83,7 @@ export default function CaseConverterPage() {
     toast({ title: "Copied to clipboard!" });
   };
   
-  const caseButtons: CaseType[] = ["lowercase", "UPPERCASE", "Sentence case", "Title Case", "camelCase", "PascalCase", "snake_case", "kebab-case"];
+  const caseButtons: CaseType[] = ["lowercase", "UPPERCASE", "Sentence case", "Title Case", "camelCase", "PascalCase", "snake_case", "kebab-case", "Reverse Text"];
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6">
