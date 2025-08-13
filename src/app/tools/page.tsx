@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import ToolCard from "@/components/tool-card";
-import { tools as allTools, toolCategories } from "@/lib/tool-registry";
-import type { Tool } from "@/lib/tool-registry";
+import { getTools, getToolCategories } from "@/lib/tool-registry";
+import type { Tool, ToolCategory } from "@/lib/tool-registry";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
@@ -13,8 +13,27 @@ function ToolsPageContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
 
+  const [allTools, setAllTools] = useState<Tool[]>([]);
+  const [toolCategories, setToolCategories] = useState<ToolCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>(categoryParam || "All");
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const [tools, categories] = await Promise.all([getTools(), getToolCategories()]);
+      setAllTools(tools);
+      setToolCategories(categories);
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    setActiveCategory(categoryParam || "All");
+  }, [categoryParam]);
 
   const filteredTools: Tool[] = allTools
     .filter((tool) =>
@@ -22,7 +41,26 @@ function ToolsPageContent() {
       tool.description.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .filter((tool) =>
-      activeCategory === "All" ? true : tool.category === activeCategory
+      activeCategory === "All" ? true : tool.categorySlug === activeCategory
+    );
+    
+  // A new interface to handle categorySlug
+  interface ExtendedTool extends Tool {
+    categorySlug?: string;
+  }
+  const toolsWithCategorySlug: ExtendedTool[] = allTools.map(tool => {
+      const category = toolCategories.find(c => c.name === tool.category);
+      return { ...tool, categorySlug: category?.slug };
+  });
+
+
+  const finalFilteredTools: ExtendedTool[] = toolsWithCategorySlug
+    .filter((tool) =>
+      tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tool.description.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter((tool) =>
+      activeCategory === "All" ? true : tool.categorySlug === activeCategory
     );
 
   return (
@@ -55,8 +93,8 @@ function ToolsPageContent() {
           {toolCategories.map((category) => (
             <Button
               key={category.id}
-              variant={activeCategory === category.name.replace(' Tools','') ? "default" : "outline"}
-              onClick={() => setActiveCategory(category.name.replace(' Tools',''))}
+              variant={activeCategory === category.slug ? "default" : "outline"}
+              onClick={() => setActiveCategory(category.slug)}
             >
               <category.icon className="mr-2 h-4 w-4" />
               {category.name}
@@ -65,15 +103,19 @@ function ToolsPageContent() {
         </div>
       </div>
 
-      {filteredTools.length > 0 ? (
+      {loading ? (
+         <div className="text-center py-16">
+          <p className="text-xl text-muted-foreground">Loading tools...</p>
+        </div>
+      ) : finalFilteredTools.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredTools.map((tool) => (
+          {finalFilteredTools.map((tool) => (
             <ToolCard key={tool.href} tool={tool} />
           ))}
         </div>
       ) : (
         <div className="text-center py-16">
-          <p className="text-xl text-muted-foreground">No tools found for your search.</p>
+          <p className="text-xl text-muted-foreground">No tools found.</p>
         </div>
       )}
     </div>

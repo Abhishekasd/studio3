@@ -1,5 +1,32 @@
+import type { LucideIcon } from "lucide-react";
 import {
-  type LucideIcon,
+  FileText,
+  Palette,
+  Code2,
+  ScanSearch,
+  Wrench,
+  CaseSensitive,
+  FileImage,
+  FileJson2,
+  Search,
+  Calculator,
+  Type,
+  Heading1,
+  QrCode,
+  ALargeSmall,
+  Link2,
+  ListRestart,
+  KeyRound,
+  Paintbrush,
+  BookText,
+  Lock,
+} from "lucide-react";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { db } from "./firebase";
+
+
+// Mapping from string names to Lucide icon components
+const iconMap: { [key: string]: LucideIcon } = {
   CaseSensitive,
   FileImage,
   FileJson2,
@@ -20,145 +47,59 @@ import {
   Paintbrush,
   BookText,
   Lock,
-} from "lucide-react";
+  // Add other icons here as needed
+};
 
+// Define interfaces for our data structures
 export interface Tool {
+  id: string;
   name: string;
+  slug: string;
   description: string;
-  href: string;
+  category: string;
+  href: string; // Corresponds to 'route' in Firestore
   icon: LucideIcon;
-  category: "Text" | "Image" | "Coding" | "SEO" | "Utility";
 }
 
 export interface ToolCategory {
-  id: "text" | "image" | "coding" | "seo" | "utility";
+  id: string;
   name: string;
+  slug: string;
   description: string;
   icon: LucideIcon;
-  tools: Tool[];
 }
 
-export const tools: Tool[] = [
-  {
-    name: "Word Counter",
-    description: "Count words, characters, sentences, and paragraphs in your text.",
-    href: "/tools/word-counter",
-    icon: Type,
-    category: "Text",
-  },
-  {
-    name: "Case Converter",
-    description: "Convert text between different letter cases like uppercase, lowercase, and more.",
-    href: "/tools/case-converter",
-    icon: ALargeSmall,
-    category: "Text",
-  },
-  {
-    name: "Slug Generator",
-    description: "Create search-engine friendly URL slugs from your text.",
-    href: "/tools/slug-generator",
-    icon: Link2,
-    category: "Text",
-  },
-    {
-    name: "Palindrome Checker",
-    description: "Check if a word, phrase, or number is a palindrome.",
-    href: "/tools/palindrome-checker",
-    icon: ListRestart,
-    category: "Text",
-  },
-   {
-    name: "Lorem Ipsum Generator",
-    description: "Generate placeholder text for your projects.",
-    href: "/tools/lorem-ipsum-generator",
-    icon: BookText,
-    category: "Text",
-  },
-  {
-    name: "Image Converter",
-    description: "Convert images between JPG, PNG, WEBP and GIF formats.",
-    href: "/tools/image-converter",
-    icon: FileImage,
-    category: "Image",
-  },
-  {
-    name: "QR Code Generator",
-    description: "Create QR codes for URLs, text, and other data instantly.",
-    href: "/tools/qr-code-generator",
-    icon: QrCode,
-    category: "Image",
-  },
-  {
-    name: "Color Converter",
-    description: "Convert colors between HEX and RGB formats.",
-    href: "/tools/color-converter",
-    icon: Paintbrush,
-    category: "Image",
-  },
-  {
-    name: "JSON Formatter",
-    description: "Format and validate your JSON data to make it readable and error-free.",
-    href: "/tools/json-formatter",
-    icon: FileJson2,
-    category: "Coding",
-  },
-   {
-    name: "UUID Generator",
-    description: "Generate universally unique identifiers (v4).",
-    href: "/tools/uuid-generator",
-    icon: KeyRound,
-    category: "Coding",
-  },
-  {
-    name: "Meta Tag Generator",
-    description: "Generate SEO-friendly meta tags for your web pages using AI.",
-    href: "/tools/meta-tag-generator",
-    icon: Heading1,
-    category: "SEO",
-  },
-  {
-    name: "Password Generator",
-    description: "Create secure, random passwords with customizable options.",
-    href: "/tools/password-generator",
-    icon: Lock,
-    category: "Utility",
-  },
-];
+// Function to fetch tools from Firestore
+export async function getTools(): Promise<Tool[]> {
+  const toolsCollection = collection(db, "tools");
+  const q = query(toolsCollection, orderBy("popularity_score", "desc"));
+  const toolSnapshot = await getDocs(q);
+  return toolSnapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: data.name,
+      slug: data.slug,
+      description: data.description,
+      category: data.category,
+      href: data.route,
+      icon: iconMap[data.icon_name] || Wrench, // Fallback to a default icon
+    };
+  });
+}
 
-export const toolCategories: Omit<ToolCategory, 'tools'>[] = [
-    {
-      id: "text",
-      name: "Text Tools",
-      description: "Manipulate and analyze text.",
-      icon: FileText,
-    },
-    {
-      id: "image",
-      name: "Image Tools",
-      description: "Convert, resize, and optimize images.",
-      icon: Palette,
-    },
-    {
-      id: "coding",
-      name: "Developer Tools",
-      description: "Format code, test regex, and more.",
-      icon: Code2,
-    },
-    {
-      id: "seo",
-      name: "SEO Tools",
-      description: "Optimize your site for search engines.",
-      icon: ScanSearch,
-    },
-    {
-      id: "utility",
-      name: "Utilities",
-      description: "Handy tools for everyday tasks.",
-      icon: Wrench,
-    },
-];
-
-export const toolsByCategory = toolCategories.map(category => ({
-    ...category,
-    tools: tools.filter(tool => tool.category === category.name.replace(' Tools', ''))
-}));
+// Function to fetch categories from Firestore
+export async function getToolCategories(): Promise<ToolCategory[]> {
+  const categoriesCollection = collection(db, "categories");
+  const categorySnapshot = await getDocs(categoriesCollection);
+  return categorySnapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: data.name,
+      slug: data.slug,
+      description: data.description,
+      icon: iconMap[data.icon_name] || Wrench, // Fallback to a default icon
+    };
+  });
+}

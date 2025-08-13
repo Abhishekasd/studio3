@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { toolCategories } from "@/lib/tool-registry";
+import { getToolCategories } from "@/lib/tool-registry";
 import { ArrowRight } from "lucide-react";
 
-export default function Home() {
+export default async function Home() {
+  const toolCategories = await getToolCategories();
+
   return (
     <div className="flex flex-col items-center">
       <section className="w-full py-20 md:py-32 lg:py-40 bg-card">
@@ -32,7 +34,7 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {toolCategories.map((category) => (
-              <Link key={category.id} href={`/tools?category=${category.name.replace(' Tools', '')}`}>
+              <Link key={category.id} href={`/tools?category=${category.slug}`}>
                 <Card className="h-full transform hover:scale-105 transition-transform duration-300 ease-in-out shadow-lg hover:shadow-xl">
                   <CardHeader>
                     <div className="flex items-center gap-4">
