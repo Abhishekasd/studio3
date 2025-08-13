@@ -91,6 +91,21 @@ const toolCategories: ToolCategory[] = [
 
 const allTools: Tool[] = [
   {
+    id: "meta-tag-generator",
+    name: "Meta Tag Generator",
+    slug: "meta-tag-generator",
+    description: "Generate SEO-optimized meta tags for your website using AI.",
+    category: "AI Tools",
+    categorySlug: "ai-tools",
+    href: "/tools/meta-tag-generator",
+    icon: ScanSearch,
+    ai_powered: true,
+    is_featured: true,
+    popularity_score: 94,
+    created_at: new Date("2024-07-31T12:00:00Z"),
+    last_updated: new Date("2024-07-31T12:00:00Z"),
+  },
+  {
     id: "text-to-speech",
     name: "Text-to-Speech Converter",
     slug: "text-to-speech",

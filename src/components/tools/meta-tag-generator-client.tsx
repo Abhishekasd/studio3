@@ -162,7 +162,7 @@ export function MetaTagGeneratorClient() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Generated Tags</CardTitle>
-                <CardDescription>Copy these tags into the `<head>` of your HTML.</CardDescription>
+                <CardDescription>Copy these tags into the `&lt;head&gt;` of your HTML.</CardDescription>
               </div>
               <Button variant="ghost" size="icon" onClick={copyToClipboard}>
                 <Copy className="h-5 w-5" />
