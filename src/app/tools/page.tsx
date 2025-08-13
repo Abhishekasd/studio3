@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, Suspense, useEffect } from "react";
@@ -18,22 +19,21 @@ function ToolsPageContent() {
   const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string>(categoryParam || "All");
+  const [activeCategory, setActiveCategory] = useState<string>("All");
 
-  useEffect(() => {
+   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       const [tools, categories] = await Promise.all([getTools(), getToolCategories()]);
       setAllTools(tools);
       setToolCategories(categories);
+      // Set active category from URL param after categories have loaded
+      const initialCategory = categoryParam || "All";
+      setActiveCategory(initialCategory);
       setLoading(false);
     }
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    setActiveCategory(categoryParam || "All");
-  }, [categoryParam]);
+  }, [categoryParam]); // Re-run if categoryParam changes
 
   const filteredTools: Tool[] = allTools
     .filter((tool) =>
@@ -86,26 +86,26 @@ function ToolsPageContent() {
 
       {loading ? (
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="bg-card p-4 rounded-lg space-y-3">
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className="bg-card p-4 rounded-lg space-y-3 animate-pulse">
               <div className="flex items-center gap-4">
-                <div className="bg-muted rounded-full h-8 w-8 animate-pulse"></div>
-                <div className="bg-muted h-6 w-1/2 animate-pulse rounded-md"></div>
+                <div className="bg-muted rounded-full h-8 w-8"></div>
+                <div className="bg-muted h-6 w-1/2 rounded-md"></div>
               </div>
-              <div className="bg-muted h-4 w-full animate-pulse rounded-md"></div>
-               <div className="bg-muted h-4 w-3/4 animate-pulse rounded-md"></div>
+              <div className="bg-muted h-4 w-full rounded-md"></div>
+               <div className="bg-muted h-4 w-3/4 rounded-md"></div>
             </div>
           ))}
         </div>
       ) : filteredTools.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredTools.map((tool) => (
-            <ToolCard key={tool.href} tool={tool} />
+            <ToolCard key={tool.id} tool={tool} />
           ))}
         </div>
       ) : (
         <div className="text-center py-16">
-          <p className="text-xl text-muted-foreground">No tools found.</p>
+          <p className="text-xl text-muted-foreground">No tools found matching your criteria.</p>
         </div>
       )}
     </div>
@@ -114,7 +114,22 @@ function ToolsPageContent() {
 
 export default function ToolsPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+       <div className="container mx-auto px-4 py-8 md:px-6">
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(12)].map((_, i) => (
+              <div key={i} className="bg-card p-4 rounded-lg space-y-3 animate-pulse">
+                <div className="flex items-center gap-4">
+                  <div className="bg-muted rounded-full h-8 w-8"></div>
+                  <div className="bg-muted h-6 w-1/2 rounded-md"></div>
+                </div>
+                <div className="bg-muted h-4 w-full rounded-md"></div>
+                 <div className="bg-muted h-4 w-3/4 rounded-md"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+    }>
       <ToolsPageContent />
     </Suspense>
   );

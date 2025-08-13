@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,7 @@ export default function ToolCard({ tool }: ToolCardProps) {
           </div>
           <CardDescription>{tool.description}</CardDescription>
         </CardHeader>
-        <div className="p-6 pt-0">
+        <div className="p-6 pt-0 mt-auto">
           <Button variant="ghost" className="w-full justify-start p-0 h-auto text-primary hover:text-primary">
             Try tool <ArrowRight className="ml-2 h-4 w-4" />
           </Button>

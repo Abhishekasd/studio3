@@ -22,38 +22,10 @@ import {
   BookText,
   Lock,
   Bot,
-  AudioLines
-} from "lucide-react";
-import { collection, getDocs, orderBy, query, Timestamp } from "firebase/firestore";
-import { db } from "./firebase";
-
-
-// Mapping from string names to Lucide icon components
-const iconMap: { [key: string]: LucideIcon } = {
-  CaseSensitive,
-  FileImage,
-  FileJson2,
-  FileText,
-  Search,
-  Wrench,
-  Calculator,
-  ScanSearch,
-  Palette,
-  Code2,
-  Type,
-  Heading1,
-  QrCode,
-  ALargeSmall,
-  Link2,
-  ListRestart,
-  KeyRound,
-  Paintbrush,
-  BookText,
-  Lock,
-  Bot,
   AudioLines,
-  // Add other icons here as needed
-};
+  HeartPulse,
+  Landmark,
+} from "lucide-react";
 
 // Define interfaces for our data structures
 export interface Tool {
@@ -62,14 +34,14 @@ export interface Tool {
   slug: string;
   description: string;
   category: string;
-  categorySlug?: string;
-  href: string; // Corresponds to 'route' in Firestore
+  categorySlug: string;
+  href: string;
   icon: LucideIcon;
   ai_powered?: boolean;
   is_featured?: boolean;
-  popularity_score?: number;
-  created_at?: Date;
-  last_updated?: Date;
+  popularity_score: number;
+  created_at: Date;
+  last_updated: Date;
 }
 
 export interface ToolCategory {
@@ -80,66 +52,265 @@ export interface ToolCategory {
   icon: LucideIcon;
 }
 
-// Function to fetch tools from Firestore
+const toolCategories: ToolCategory[] = [
+  {
+    id: "text-tools",
+    name: "Text Tools",
+    slug: "text-tools",
+    description: "Tools for manipulating and analyzing text.",
+    icon: FileText,
+  },
+  {
+    id: "ai-tools",
+    name: "AI Tools",
+    slug: "ai-tools",
+    description: "Harness the power of AI with these smart tools.",
+    icon: Bot,
+  },
+  {
+    id: "calculators",
+    name: "Calculators",
+    slug: "calculators",
+    description: "Perform various calculations for finance, health, and more.",
+    icon: Calculator,
+  },
+   {
+    id: "converters",
+    name: "Converters",
+    slug: "converters",
+    description: "Convert between different file formats and units.",
+    icon: ListRestart,
+  },
+  {
+    id: "image-tools",
+    name: "Image Tools",
+    slug: "image-tools",
+    description: "Edit, convert, and manipulate images.",
+    icon: FileImage,
+  },
+  {
+    id: "generators",
+    name: "Generators",
+    slug: "generators",
+    description: "Generate passwords, slugs, QR codes and more.",
+    icon: Wrench,
+  },
+];
+
+const allTools: Tool[] = [
+  {
+    id: "text-to-speech",
+    name: "Text-to-Speech Converter",
+    slug: "text-to-speech",
+    description: "Convert text into natural-sounding speech with our AI-powered TTS tool.",
+    category: "AI Tools",
+    categorySlug: "ai-tools",
+    href: "/tools/text-to-speech",
+    icon: AudioLines,
+    ai_powered: true,
+    is_featured: true,
+    popularity_score: 90,
+    created_at: new Date("2024-07-28T12:00:00Z"),
+    last_updated: new Date("2024-07-28T12:00:00Z"),
+  },
+  {
+    id: "bmi-calculator",
+    name: "BMI Calculator",
+    slug: "bmi-calculator",
+    description: "Check your Body Mass Index to assess your health.",
+    category: "Calculators",
+    categorySlug: "calculators",
+    href: "/tools/bmi-calculator",
+    icon: HeartPulse,
+    popularity_score: 88,
+    created_at: new Date("2024-07-27T12:00:00Z"),
+    last_updated: new Date("2024-07-27T12:00:00Z"),
+  },
+  {
+    id: "loan-calculator",
+    name: "Loan Calculator",
+    slug: "loan-calculator",
+    description: "Estimate your monthly loan payments and total interest.",
+    category: "Calculators",
+    categorySlug: "calculators",
+    href: "/tools/loan-calculator",
+    icon: Landmark,
+    is_featured: true,
+    popularity_score: 92,
+    created_at: new Date("2024-07-26T12:00:00Z"),
+    last_updated: new Date("2024-07-26T12:00:00Z"),
+  },
+  {
+    id: "case-converter",
+    name: "Case Converter",
+    slug: "case-converter",
+    description: "Change text to uppercase, lowercase, title case, and more.",
+    category: "Text Tools",
+    categorySlug: "text-tools",
+    href: "/tools/case-converter",
+    icon: CaseSensitive,
+    is_featured: true,
+    popularity_score: 85,
+    created_at: new Date("2024-07-25T12:00:00Z"),
+    last_updated: new Date("2024-07-25T12:00:00Z"),
+  },
+  {
+    id: "word-counter",
+    name: "Word Counter",
+    slug: "word-counter",
+    description: "Count words, characters, sentences, and paragraphs in your text.",
+    category: "Text Tools",
+    categorySlug: "text-tools",
+    href: "/tools/word-counter",
+    icon: ALargeSmall,
+    popularity_score: 80,
+    created_at: new Date("2024-07-24T12:00:00Z"),
+    last_updated: new Date("2024-07-24T12:00:00Z"),
+  },
+  {
+    id: "json-formatter",
+    name: "JSON Formatter",
+    slug: "json-formatter",
+    description: "Format, validate, and beautify your JSON data.",
+    category: "Generators",
+    categorySlug: "generators",
+    href: "/tools/json-formatter",
+    icon: FileJson2,
+    popularity_score: 89,
+    created_at: new Date("2024-07-23T12:00:00Z"),
+    last_updated: new Date("2024-07-23T12:00:00Z"),
+  },
+    {
+    id: "meta-tag-generator",
+    name: "AI Meta Tag Generator",
+    slug: "meta-tag-generator",
+    description: "Generate SEO-optimized meta tags for your website using AI.",
+    category: "AI Tools",
+    categorySlug: "ai-tools",
+    href: "/tools/meta-tag-generator",
+    icon: Bot,
+    ai_powered: true,
+    is_featured: true,
+    popularity_score: 95,
+    created_at: new Date("2024-07-22T12:00:00Z"),
+    last_updated: new Date("2024-07-22T12:00:00Z"),
+  },
+  {
+    id: "palindrome-checker",
+    name: "Palindrome Checker",
+    slug: "palindrome-checker",
+    description: "Check if a word or phrase is a palindrome.",
+    category: "Text Tools",
+    categorySlug: "text-tools",
+    href: "/tools/palindrome-checker",
+    icon: BookText,
+    popularity_score: 70,
+    created_at: new Date("2024-07-21T12:00:00Z"),
+    last_updated: new Date("2024-07-21T12:00:00Z"),
+  },
+  {
+    id: "password-generator",
+    name: "Password Generator",
+    slug: "password-generator",
+    description: "Create secure, random passwords for your accounts.",
+    category: "Generators",
+    categorySlug: "generators",
+    href: "/tools/password-generator",
+    icon: KeyRound,
+    is_featured: true,
+    popularity_score: 93,
+    created_at: new Date("2024-07-20T12:00:00Z"),
+    last_updated: new Date("2024-07-20T12:00:00Z"),
+  },
+  {
+    id: "qr-code-generator",
+    name: "QR Code Generator",
+    slug: "qr-code-generator",
+    description: "Create your own QR codes for URLs, text, and more.",
+    category: "Generators",
+    categorySlug: "generators",
+    href: "/tools/qr-code-generator",
+    icon: QrCode,
+    popularity_score: 87,
+    created_at: new Date("2024-07-19T12:00:00Z"),
+    last_updated: new Date("2024-07-19T12:00:00Z"),
+  },
+  {
+    id: "slug-generator",
+    name: "Slug Generator",
+    slug: "slug-generator",
+    description: "Create clean and SEO-friendly URL slugs from text.",
+    category: "Generators",
+    categorySlug: "generators",
+    href: "/tools/slug-generator",
+    icon: Link2,
+    popularity_score: 82,
+    created_at: new Date("2024-07-18T12:00:00Z"),
+    last_updated: new Date("2024-07-18T12:00:00Z"),
+  },
+  {
+    id: "lorem-ipsum-generator",
+    name: "Lorem Ipsum Generator",
+    slug: "lorem-ipsum-generator",
+    description: "Generate placeholder text for your designs and layouts.",
+    category: "Generators",
+    categorySlug: "generators",
+    href: "/tools/lorem-ipsum-generator",
+    icon: Type,
+    popularity_score: 75,
+    created_at: new Date("2024-07-17T12:00:00Z"),
+    last_updated: new Date("2024-07-17T12:00:00Z"),
+  },
+  {
+    id: "color-converter",
+    name: "Color Converter",
+    slug: "color-converter",
+    description: "Convert colors between HEX, RGB, and other formats.",
+    category: "Converters",
+    categorySlug: "converters",
+    href: "/tools/color-converter",
+    icon: Palette,
+    popularity_score: 86,
+    created_at: new Date("2024-07-16T12:00:00Z"),
+    last_updated: new Date("2024-07-16T12:00:00Z"),
+  },
+  {
+    id: "image-converter",
+    name: "Image Converter",
+    slug: "image-converter",
+    description: "Convert images between JPG, PNG, WEBP, and other formats.",
+    category: "Image Tools",
+    categorySlug: "image-tools",
+    href: "/tools/image-converter",
+    icon: FileImage,
+    is_featured: true,
+    popularity_score: 91,
+    created_at: new Date("2024-07-15T12:00:00Z"),
+    last_updated: new Date("2024-07-15T12:00:00Z"),
+  },
+    {
+    id: "uuid-generator",
+    name: "UUID Generator",
+    slug: "uuid-generator",
+    description: "Generate universally unique identifiers (v4).",
+    category: "Generators",
+    categorySlug: "generators",
+    href: "/tools/uuid-generator",
+    icon: KeyRound,
+    popularity_score: 78,
+    created_at: new Date("2024-07-14T12:00:00Z"),
+    last_updated: new Date("2024-07-14T12:00:00Z"),
+  },
+];
+
+// Function to get tools (now from local array)
 export async function getTools(): Promise<Tool[]> {
-  try {
-    const toolsCollection = collection(db, "tools");
-    const q = query(toolsCollection, orderBy("popularity_score", "desc"));
-    const toolSnapshot = await getDocs(q);
-    
-    // Fetch categories once to map category name to slug
-    const categories = await getToolCategories();
-    const categorySlugMap = new Map(categories.map(c => [c.name, c.slug]));
-
-    return toolSnapshot.docs.map(doc => {
-      const data = doc.data();
-      
-      const toDate = (timestamp: any): Date | undefined => {
-          if (timestamp instanceof Timestamp) {
-              return timestamp.toDate();
-          }
-          return undefined;
-      }
-
-      return {
-        id: doc.id,
-        name: data.name || "Unnamed Tool",
-        slug: data.slug || "",
-        description: data.description || "",
-        category: data.category || "General",
-        categorySlug: categorySlugMap.get(data.category) || "general",
-        href: data.route || `/tools/${data.slug}`,
-        icon: iconMap[data.icon_name] || Wrench, // Fallback to a default icon
-        ai_powered: data.ai_powered || false,
-        is_featured: data.is_featured || false,
-        popularity_score: data.popularity_score || 0,
-        created_at: toDate(data.created_at),
-        last_updated: toDate(data.last_updated),
-      };
-    });
-  } catch (error) {
-    console.error("Error fetching tools:", error);
-    return []; // Return empty array on error
-  }
+  // Sort by popularity score by default
+  const sortedTools = allTools.sort((a, b) => b.popularity_score - a.popularity_score);
+  return Promise.resolve(sortedTools);
 }
 
-// Function to fetch categories from Firestore
+// Function to get categories (now from local array)
 export async function getToolCategories(): Promise<ToolCategory[]> {
-  try {
-    const categoriesCollection = collection(db, "categories");
-    const categorySnapshot = await getDocs(categoriesCollection);
-    return categorySnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        name: data.name || "Unnamed Category",
-        slug: data.slug || "",
-        description: data.description || "",
-        icon: iconMap[data.icon_name] || Wrench, // Fallback to a default icon
-      };
-    });
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-    return []; // Return empty array on error
-  }
+  return Promise.resolve(toolCategories);
 }
