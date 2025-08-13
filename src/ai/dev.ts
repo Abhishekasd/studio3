@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
-config();
+config({ path: '.env.local' });
 
 import '@/ai/flows/generate-meta-tags.ts';
 import '@/ai/flows/text-to-speech.ts';
+import '@/ai/flows/remove-image-background.ts';

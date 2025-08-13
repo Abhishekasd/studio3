@@ -31,6 +31,7 @@ import {
   FilePlus2,
   FileArchive,
   FileText as FileWord,
+  Scissors,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -104,6 +105,21 @@ const toolCategories: ToolCategory[] = [
 ];
 
 const allTools: Tool[] = [
+  {
+    id: "image-background-remover",
+    name: "Image Background Remover",
+    slug: "image-background-remover",
+    description: "Automatically remove the background from any image.",
+    category: "AI Tools",
+    categorySlug: "ai-tools",
+    href: "/tools/image-background-remover",
+    icon: Scissors,
+    ai_powered: true,
+    is_featured: true,
+    popularity_score: 98,
+    created_at: new Date("2024-08-12T10:00:00Z"),
+    last_updated: new Date("2024-08-12T10:00:00Z"),
+  },
   {
     id: "word-to-pdf",
     name: "Word to PDF",
