@@ -9,24 +9,29 @@ import { Check, X } from "lucide-react";
 
 export default function PalindromeCheckerPage() {
   const [text, setText] = useState('');
-  const [result, setResult] = useState<boolean | null>(null);
+  const [hasChecked, setHasChecked] = useState(false);
 
   const isPalindrome = useMemo(() => {
     if (!text.trim()) return null;
-    const cleanText = text.toLowerCase().replace(/[^a-z0-9]/g, '');
+    // Sanitize the input by removing non-alphanumeric characters and converting to lower case
+    const cleanText = text.toLowerCase().replace(/[\W_]/g, '');
     if (!cleanText) return null;
     const reversedText = cleanText.split('').reverse().join('');
     return cleanText === reversedText;
   }, [text]);
 
   const handleCheck = () => {
-    setResult(isPalindrome);
+    if(text.trim()){
+      setHasChecked(true);
+    }
   };
   
   const handleClear = () => {
     setText('');
-    setResult(null);
+    setHasChecked(false);
   }
+
+  const result = hasChecked ? isPalindrome : null;
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6">
@@ -48,16 +53,16 @@ export default function PalindromeCheckerPage() {
               value={text}
               onChange={(e) => {
                 setText(e.target.value);
-                setResult(null); // Reset result on change
+                setHasChecked(false); // Reset result on change
               }}
-              placeholder="e.g., racecar"
+              placeholder="e.g., A man, a plan, a canal: Panama"
             />
           </div>
           <div className="flex gap-2">
             <Button onClick={handleCheck} disabled={!text.trim()} className="flex-1">
               Check
             </Button>
-            <Button onClick={handleClear} variant="outline" disabled={!text.trim() && result === null}>
+            <Button onClick={handleClear} variant="outline" disabled={!text.trim() && !hasChecked}>
               Clear
             </Button>
           </div>

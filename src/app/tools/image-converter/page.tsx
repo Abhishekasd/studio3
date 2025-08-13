@@ -4,30 +4,39 @@ import { useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Download, FileImage, ArrowRight } from "lucide-react";
+import { Upload, Download } from "lucide-react";
 import Image from 'next/image';
+
+type ImageFormat = "jpeg" | "png" | "webp" | "gif";
+const supportedFormats = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 export default function ImageConverterPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [convertedUrl, setConvertedUrl] = useState<string | null>(null);
+  const [outputFormat, setOutputFormat] = useState<ImageFormat>("jpeg");
   const [isConverting, setIsConverting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.type === "image/png") {
+    if (file && supportedFormats.includes(file.type)) {
       setSelectedFile(file);
       setConvertedUrl(null);
+      const reader = new FileReader();
+      reader.onload = (e) => setOriginalUrl(e.target?.result as string);
+      reader.readAsDataURL(file);
     } else {
       toast({
         variant: "destructive",
         title: "Invalid File Type",
-        description: "Please select a PNG file.",
+        description: "Please select a PNG, JPG, WEBP, or GIF file.",
       });
       setSelectedFile(null);
+      setOriginalUrl(null);
     }
   };
 
@@ -44,14 +53,16 @@ export default function ImageConverterPage() {
         canvas.height = img.height;
         const ctx = canvas.getContext("2d");
         if (ctx) {
-          ctx.fillStyle = "#FFFFFF"; // Set background to white for transparency
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          if (outputFormat === 'jpeg' || outputFormat === 'webp') {
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
           ctx.drawImage(img, 0, 0);
-          const jpgUrl = canvas.toDataURL("image/jpeg");
-          setConvertedUrl(jpgUrl);
+          const convertedDataUrl = canvas.toDataURL(`image/${outputFormat}`);
+          setConvertedUrl(convertedDataUrl);
           toast({
             title: "Conversion Successful",
-            description: "Your image has been converted to JPG.",
+            description: `Your image has been converted to ${outputFormat.toUpperCase()}.`,
           });
         }
         setIsConverting(false);
@@ -65,7 +76,8 @@ export default function ImageConverterPage() {
     if (!convertedUrl || !selectedFile) return;
     const link = document.createElement("a");
     link.href = convertedUrl;
-    link.download = selectedFile.name.replace(/\.png$/, ".jpg");
+    const oldExtension = selectedFile.name.split('.').pop();
+    link.download = selectedFile.name.replace(new RegExp(`\\.${oldExtension}$`), `.${outputFormat}`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -77,13 +89,13 @@ export default function ImageConverterPage() {
     <div className="container mx-auto px-4 py-8 md:px-6">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold font-headline">Image Converter</h1>
-        <p className="text-muted-foreground text-lg">Convert PNG images to JPG on the client-side.</p>
+        <p className="text-muted-foreground text-lg">Convert images between JPG, PNG, WEBP, and GIF formats.</p>
       </div>
 
-      <Card className="max-w-3xl mx-auto">
+      <Card className="max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle>PNG to JPG</CardTitle>
-          <CardDescription>Upload your PNG file and convert it to a JPG file instantly.</CardDescription>
+          <CardTitle>Image Conversion</CardTitle>
+          <CardDescription>Upload your image and choose the format to convert to.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div 
@@ -100,36 +112,51 @@ export default function ImageConverterPage() {
               type="file"
               className="hidden"
               onChange={handleFileChange}
-              accept="image/png"
+              accept={supportedFormats.join(',')}
             />
           </div>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+             {originalUrl && (
+                <div className="space-y-2">
+                    <h3 className="text-center font-semibold">Original</h3>
+                    <div className="flex justify-center border rounded-lg p-2">
+                      <Image src={originalUrl} alt="Original image" width={300} height={200} className="rounded-md object-contain max-h-[200px]" />
+                    </div>
+                </div>
+              )}
+             {convertedUrl && (
+                <div className="space-y-2">
+                    <h3 className="text-center font-semibold">Converted</h3>
+                    <div className="flex justify-center border rounded-lg p-2">
+                        <Image src={convertedUrl} alt="Converted image" width={300} height={200} className="rounded-md object-contain max-h-[200px]" />
+                    </div>
+                </div>
+              )}
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+              <Select onValueChange={(v) => setOutputFormat(v as ImageFormat)} defaultValue={outputFormat}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Convert to..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="jpeg">JPG</SelectItem>
+                  <SelectItem value="png">PNG</SelectItem>
+                  <SelectItem value="webp">WEBP</SelectItem>
+                  <SelectItem value="gif">GIF</SelectItem>
+                </SelectContent>
+              </Select>
 
-          <div className="flex items-center justify-center gap-4">
-              <div className="flex items-center gap-2 text-lg font-medium">
-                  <FileImage className="w-6 h-6 text-red-500"/>
-                  <span>PNG</span>
-              </div>
-              <ArrowRight className="w-8 h-8 text-muted-foreground"/>
-              <div className="flex items-center gap-2 text-lg font-medium">
-                  <FileImage className="w-6 h-6 text-blue-500"/>
-                  <span>JPG</span>
-              </div>
+              <Button onClick={handleConvert} disabled={!selectedFile || isConverting} className="flex-grow">
+                {isConverting ? "Converting..." : `Convert to ${outputFormat.toUpperCase()}`}
+              </Button>
           </div>
 
-          <Button onClick={handleConvert} disabled={!selectedFile || isConverting} className="w-full">
-            {isConverting ? "Converting..." : "Convert to JPG"}
-          </Button>
-
           {convertedUrl && (
-            <div className="space-y-4 text-center">
-              <h3 className="text-lg font-semibold">Conversion Complete!</h3>
-              <div className="flex justify-center">
-                <Image src={convertedUrl} alt="Converted JPG" width={300} height={200} className="rounded-lg border shadow-md" />
-              </div>
-              <Button onClick={handleDownload} variant="secondary" className="w-full">
-                <Download className="mr-2 h-4 w-4" /> Download JPG
-              </Button>
-            </div>
+            <Button onClick={handleDownload} variant="secondary" className="w-full">
+              <Download className="mr-2 h-4 w-4" /> Download Image
+            </Button>
           )}
         </CardContent>
       </Card>

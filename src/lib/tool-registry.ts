@@ -16,6 +16,9 @@ import {
   ALargeSmall,
   Link2,
   ListRestart,
+  KeyRound,
+  Paintbrush,
+  BookText,
 } from "lucide-react";
 
 export interface Tool {
@@ -63,9 +66,16 @@ export const tools: Tool[] = [
     icon: ListRestart,
     category: "Text",
   },
+   {
+    name: "Lorem Ipsum Generator",
+    description: "Generate placeholder text for your projects.",
+    href: "/tools/lorem-ipsum-generator",
+    icon: BookText,
+    category: "Text",
+  },
   {
     name: "Image Converter",
-    description: "Convert images from PNG to JPG format quickly and easily.",
+    description: "Convert images between JPG, PNG, WEBP and GIF formats.",
     href: "/tools/image-converter",
     icon: FileImage,
     category: "Image",
@@ -78,10 +88,24 @@ export const tools: Tool[] = [
     category: "Image",
   },
   {
+    name: "Color Converter",
+    description: "Convert colors between HEX and RGB formats.",
+    href: "/tools/color-converter",
+    icon: Paintbrush,
+    category: "Image",
+  },
+  {
     name: "JSON Formatter",
     description: "Format and validate your JSON data to make it readable and error-free.",
     href: "/tools/json-formatter",
     icon: FileJson2,
+    category: "Coding",
+  },
+   {
+    name: "UUID Generator",
+    description: "Generate universally unique identifiers (v4).",
+    href: "/tools/uuid-generator",
+    icon: KeyRound,
     category: "Coding",
   },
   {

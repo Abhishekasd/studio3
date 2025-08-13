@@ -5,15 +5,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Trash2, ArrowRight } from "lucide-react";
+import { Copy, Trash2 } from "lucide-react";
 
-type CaseType = "lowercase" | "UPPERCASE" | "Sentence case" | "Title Case";
+type CaseType = "lowercase" | "UPPERCASE" | "Sentence case" | "Title Case" | "camelCase" | "PascalCase" | "snake_case" | "kebab-case";
 
 export default function CaseConverterPage() {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const { toast } = useToast();
 
+  const toCamelCase = (str: string) => {
+    return str.replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
+      return index === 0 ? word.toLowerCase() : word.toUpperCase();
+    }).replace(/\s+/g, '');
+  };
+
+  const toPascalCase = (str: string) => {
+    return str.replace(/(?:^\w|[A-Z]|\b\w)/g, (word) => word.toUpperCase()).replace(/\s+/g, '');
+  };
+
+  const toSnakeCase = (str: string) => {
+    return str.replace(/\s+/g, '_').toLowerCase();
+  };
+
+  const toKebabCase = (str: string) => {
+    return str.replace(/\s+/g, '-').toLowerCase();
+  };
+  
   const handleConvert = (caseType: CaseType) => {
     if (!inputText.trim()) {
       toast({ title: "Input is empty", description: "Please enter some text to convert." });
@@ -34,6 +52,18 @@ export default function CaseConverterPage() {
       case 'Title Case':
         result = inputText.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         break;
+      case 'camelCase':
+        result = toCamelCase(inputText);
+        break;
+      case 'PascalCase':
+        result = toPascalCase(inputText);
+        break;
+      case 'snake_case':
+        result = toSnakeCase(inputText);
+        break;
+      case 'kebab-case':
+        result = toKebabCase(inputText);
+        break;
     }
     setOutputText(result);
     toast({ title: "Text Converted!", description: `Successfully converted to ${caseType}.` });
@@ -50,7 +80,7 @@ export default function CaseConverterPage() {
     toast({ title: "Copied to clipboard!" });
   };
   
-  const caseButtons: CaseType[] = ["lowercase", "UPPERCASE", "Sentence case", "Title Case"];
+  const caseButtons: CaseType[] = ["lowercase", "UPPERCASE", "Sentence case", "Title Case", "camelCase", "PascalCase", "snake_case", "kebab-case"];
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6">
