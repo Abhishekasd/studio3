@@ -11,13 +11,11 @@ import { Upload, Download, FileText, Loader2, Trash2 } from "lucide-react";
 import type { Buffer } from 'buffer';
 
 // Lazily import docx-pdf to handle environments where it might fail
-let docx: (buffer: Buffer, callback: (err: any, result: Buffer | null) => void) => void;
-if (process.env.NODE_ENV !== 'production' || !process.env.CI) {
-  try {
-    docx = require('docx-pdf');
-  } catch (e) {
-    console.error("Could not load docx-pdf library.", e);
-  }
+let docx: ((buffer: Buffer, callback: (err: any, result: Buffer | null) => void) => void) | null = null;
+try {
+  docx = require('docx-pdf');
+} catch (e) {
+  console.error("Could not load docx-pdf library. The Word to PDF tool may not be available.", e);
 }
 
 
@@ -25,7 +23,7 @@ async function convertWordToPdf(prevState: any, formData: FormData): Promise<{ p
   'use server';
   
   if (!docx) {
-    return { error: "The converter is not available in this environment. Please try again later." };
+    return { error: "The converter is not available in this environment due to incompatible dependencies. This feature works best in a local development setup." };
   }
 
   const file = formData.get("doc") as File;
@@ -43,7 +41,7 @@ async function convertWordToPdf(prevState: any, formData: FormData): Promise<{ p
     const buffer = Buffer.from(arrayBuffer);
     
     return new Promise((resolve) => {
-        docx(buffer, (err, result) => {
+        docx!(buffer, (err, result) => {
             if (err) {
                 console.error("Conversion error:", err);
                 resolve({ error: "Failed to convert the document. It might be corrupted or in an unsupported format." });
@@ -155,7 +153,7 @@ export default function WordToPdfPage() {
                 {selectedFile && (
                     <div className="flex gap-2">
                         <SubmitButton />
-                        <Button onClick={handleClear} variant="outline">
+                        <Button onClick={handleClear} variant="outline" type="button">
                             <Trash2 className="mr-2 h-4 w-4" />
                             Clear
                         </Button>
