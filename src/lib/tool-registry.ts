@@ -26,6 +26,7 @@ import {
   Landmark,
   Scale,
   Ratio,
+  Shrink,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -283,7 +284,7 @@ const allTools: Tool[] = [
     created_at: new Date("2024-07-30T11:00:00Z"),
     last_updated: new Date("2024-07-30T11:00:00Z"),
   },
-    {
+  {
     id: "image-resizer",
     name: "Image Resizer",
     slug: "image-resizer",
@@ -296,6 +297,20 @@ const allTools: Tool[] = [
     is_featured: true,
     created_at: new Date("2024-08-02T10:00:00Z"),
     last_updated: new Date("2024-08-02T10:00:00Z"),
+  },
+  {
+    id: "image-compressor",
+    name: "Image Compressor",
+    slug: "image-compressor",
+    description: "Reduce image file sizes for faster web pages.",
+    category: "Converters",
+    categorySlug: "converters",
+    href: "/tools/image-compressor",
+    icon: Shrink,
+    popularity_score: 90,
+    is_featured: true,
+    created_at: new Date("2024-08-03T10:00:00Z"),
+    last_updated: new Date("2024-08-03T10:00:00Z"),
   },
   {
     id: "color-converter",
