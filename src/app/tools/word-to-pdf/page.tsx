@@ -8,12 +8,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, Download, FileText, Loader2, Trash2 } from "lucide-react";
-import docx from 'docx-pdf';
-import { Buffer } from 'buffer';
+import type { Buffer } from 'buffer';
+
+// Lazily import docx-pdf to handle environments where it might fail
+let docx: (buffer: Buffer, callback: (err: any, result: Buffer | null) => void) => void;
+if (process.env.NODE_ENV !== 'production' || !process.env.CI) {
+  try {
+    docx = require('docx-pdf');
+  } catch (e) {
+    console.error("Could not load docx-pdf library.", e);
+  }
+}
+
 
 async function convertWordToPdf(prevState: any, formData: FormData): Promise<{ pdfDataUri?: string; error?: string }> {
   'use server';
   
+  if (!docx) {
+    return { error: "The converter is not available in this environment. Please try again later." };
+  }
+
   const file = formData.get("doc") as File;
 
   if (!file || file.size === 0) {
@@ -28,22 +42,18 @@ async function convertWordToPdf(prevState: any, formData: FormData): Promise<{ p
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         docx(buffer, (err, result) => {
             if (err) {
                 console.error("Conversion error:", err);
-                // The library might not give detailed errors, so a generic message is often best.
-                return reject(new Error("Failed to convert the document. It might be corrupted or in an unsupported format."));
-            }
-            if (result) {
+                resolve({ error: "Failed to convert the document. It might be corrupted or in an unsupported format." });
+            } else if (result) {
                  const pdfDataUri = `data:application/pdf;base64,${result.toString('base64')}`;
                  resolve({ pdfDataUri });
             } else {
-                 reject(new Error("Conversion resulted in an empty file."));
+                 resolve({ error: "Conversion resulted in an empty file." });
             }
         });
-    }).catch(err => {
-        return { error: err.message };
     });
     
   } catch (err: any) {
