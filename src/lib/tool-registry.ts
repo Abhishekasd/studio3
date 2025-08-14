@@ -44,6 +44,7 @@ import {
   Presentation,
   Globe,
   Camera,
+  FileCode,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -334,6 +335,20 @@ const allTools: Tool[] = [
     is_featured: true,
     created_at: new Date("2024-08-28T10:00:00Z"),
     last_updated: new Date("2024-08-28T10:00:00Z"),
+  },
+  {
+    id: 'pdf-to-html',
+    name: 'PDF to HTML',
+    slug: 'pdf-to-html',
+    description: 'Convert PDF files to structured HTML documents.',
+    category: 'PDF Tools',
+    categorySlug: 'pdf-tools',
+    href: '/tools/pdf-to-html',
+    icon: FileCode,
+    is_featured: false,
+    popularity_score: 89,
+    created_at: new Date('2024-09-06T10:00:00Z'),
+    last_updated: new Date('2024-09-06T10:00:00Z'),
   },
   {
     id: "password-generator",
