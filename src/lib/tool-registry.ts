@@ -43,6 +43,7 @@ import {
   FileSpreadsheet,
   Presentation,
   Globe,
+  Camera,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -277,6 +278,20 @@ const allTools: Tool[] = [
     is_featured: true,
     created_at: new Date("2024-09-02T10:00:00Z"),
     last_updated: new Date("2024-09-02T10:00:00Z"),
+  },
+   {
+    id: "scan-to-pdf",
+    name: "Scan to PDF",
+    slug: "scan-to-pdf",
+    description: "Use your camera to scan documents and save them as a PDF.",
+    category: "PDF Tools",
+    categorySlug: "pdf-tools",
+    href: "/tools/scan-to-pdf",
+    icon: Camera,
+    popularity_score: 95,
+    is_featured: true,
+    created_at: new Date("2024-09-03T10:00:00Z"),
+    last_updated: new Date("2024-09-03T10:00:00Z"),
   },
   {
     id: "password-generator",
