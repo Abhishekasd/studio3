@@ -1,74 +1,101 @@
-{
-  "name": "nextn",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev --turbopack -p 9002",
-    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
-    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@genkit-ai/googleai": "^1.14.1",
-    "@genkit-ai/next": "^1.14.1",
-    "@hookform/resolvers": "^4.1.3",
-    "@radix-ui/react-accordion": "^1.2.3",
-    "@radix-ui/react-alert-dialog": "^1.1.6",
-    "@radix-ui/react-avatar": "^1.1.3",
-    "@radix-ui/react-checkbox": "^1.1.4",
-    "@radix-ui/react-collapsible": "^1.1.11",
-    "@radix-ui/react-dialog": "^1.1.6",
-    "@radix-ui/react-dropdown-menu": "^2.1.6",
-    "@radix-ui/react-label": "^2.1.2",
-    "@radix-ui/react-menubar": "^1.1.6",
-    "@radix-ui/react-popover": "^1.1.6",
-    "@radix-ui/react-progress": "^1.1.2",
-    "@radix-ui/react-radio-group": "^1.2.3",
-    "@radix-ui/react-scroll-area": "^1.2.3",
-    "@radix-ui/react-select": "^2.1.6",
-    "@radix-ui/react-separator": "^1.1.2",
-    "@radix-ui/react-slider": "^1.2.3",
-    "@radix-ui/react-slot": "^1.2.3",
-    "@radix-ui/react-switch": "^1.1.3",
-    "@radix-ui/react-tabs": "^1.1.3",
-    "@radix-ui/react-toast": "^1.2.6",
-    "@radix-ui/react-tooltip": "^1.1.8",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "date-fns": "^3.6.0",
-    "docx-pdf": "^0.0.1",
-    "dotenv": "^16.5.0",
-    "embla-carousel-react": "^8.6.0",
-    "firebase": "^11.9.1",
-    "firebase-admin": "^12.2.0",
-    "firebase-functions": "^5.0.1",
-    "framer-motion": "^11.2.10",
-    "genkit": "^1.14.1",
-    "lucide-react": "^0.475.0",
-    "next": "15.3.3",
-    "pdf-lib": "^1.17.1",
-    "prettier": "^3.3.2",
-    "react": "^18.3.1",
-    "react-day-picker": "^8.10.1",
-    "react-dom": "^18.3.1",
-    "react-hook-form": "^7.54.2",
-    "recharts": "^2.15.1",
-    "tailwind-merge": "^3.0.1",
-    "tailwindcss-animate": "^1.0.7",
-    "wav": "^1.0.2",
-    "zod": "^3.24.2"
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "@types/prettier": "^3.0.0",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "genkit-cli": "^1.14.1",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
-  }
+
+"use client";
+
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { Copy, Trash2, Wand2 } from "lucide-react";
+import { format } from "prettier/standalone";
+import * as prettierPluginBabel from "prettier/plugins/babel";
+import * as prettierPluginEstree from "prettier/plugins/estree";
+
+export default function JsonFormatterPage() {
+  const [input, setInput] = useState('');
+  const [output, setOutput] = useState('');
+  const { toast } = useToast();
+
+  const handleFormat = async () => {
+    if (!input.trim()) {
+      toast({ title: "Input is empty", description: "Please paste some JSON to format." });
+      return;
+    }
+    try {
+      const formatted = await format(input, {
+        parser: "json",
+        plugins: [prettierPluginBabel, prettierPluginEstree],
+        // Prettier options
+        semi: false,
+        singleQuote: false,
+        tabWidth: 2,
+      });
+      setOutput(formatted);
+      toast({
+        title: "JSON Formatted",
+        description: `Your JSON has been successfully formatted.`,
+      });
+    } catch (error: any) {
+      setOutput(`// Formatting Error:\n// ${error.message}\n\n${input}`);
+      toast({
+        variant: "destructive",
+        title: "Invalid JSON",
+        description: `Could not parse the JSON data. Please check for syntax errors.`,
+      });
+    }
+  };
+
+  const handleClear = () => {
+    setInput('');
+    setOutput('');
+  };
+  
+  const handleCopy = () => {
+    if (!output) return;
+    navigator.clipboard.writeText(output);
+    toast({ title: "Copied to clipboard!" });
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8 md:px-6">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold font-headline">JSON Formatter</h1>
+        <p className="text-muted-foreground text-lg">Easily format, validate, and beautify your JSON data.</p>
+      </div>
+
+      <Card className="max-w-6xl mx-auto">
+        <CardHeader>
+            <CardTitle>JSON Formatter & Validator</CardTitle>
+            <CardDescription>Paste your JSON code below and click format.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <div className="grid md:grid-cols-2 gap-8">
+                <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={`Paste your JSON here...`}
+                className="min-h-[400px] font-mono text-sm resize-y"
+                />
+                <Textarea
+                value={output}
+                readOnly
+                placeholder="Formatted JSON will appear here..."
+                className="min-h-[400px] font-mono text-sm resize-y bg-muted"
+                />
+            </div>
+             <div className="flex flex-wrap gap-2 mt-4 justify-end">
+                <Button variant="outline" onClick={handleCopy} disabled={!output}>
+                <Copy className="mr-2 h-4 w-4" /> Copy
+                </Button>
+                <Button variant="outline" onClick={handleClear} disabled={!input}>
+                <Trash2 className="mr-2 h-4 w-4" /> Clear
+                </Button>
+                <Button onClick={handleFormat} disabled={!input}>
+                <Wand2 className="mr-2 h-4 w-4" /> Format
+                </Button>
+            </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
