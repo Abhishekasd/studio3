@@ -1,12 +1,13 @@
 
 'use server';
 
-import { PDFDocument, degrees, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, degrees, rgb, StandardFonts, PNG } from 'pdf-lib';
 
 interface PdfEditorState {
   fileDataUri?: string;
   fileName?: string;
   error?: string;
+  pageCount?: number;
 }
 
 // Helper function to parse page ranges like "1, 3-5, 8"
@@ -52,18 +53,13 @@ function parsePageOrder(orderStr: string, maxPages: number): number[] | { error:
         seen.add(page);
     }
     
-    // Optional: Check if all pages are included. For rearranging, they should be.
-    // if (seen.size !== maxPages) {
-    //     return { error: `You must include all ${maxPages} page numbers in the new order.` };
-    // }
-    
     return pages.map(p => p - 1); // convert to 0-based index
 }
 
 
 export async function processPdf(prevState: any, formData: FormData): Promise<PdfEditorState> {
   const file = formData.get("pdf") as File;
-  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange" | "unlock" | "add-page-numbers" | "header-footer" | "flatten";
+  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange" | "unlock" | "add-page-numbers" | "header-footer" | "flatten" | "add-signature";
   
   if (!file || file.size === 0) {
     return { error: "Please select a PDF file." };
@@ -75,6 +71,7 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
   try {
     const arrayBuffer = await file.arrayBuffer();
     
+    // Some operations don't need the doc loaded immediately
     if (operation === 'unlock') {
         const password = formData.get("password") as string;
         if (!password) {
@@ -97,6 +94,39 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
     
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const pageCount = pdfDoc.getPageCount();
+
+    if (operation === 'add-signature') {
+        const signatureImgData = formData.get('signatureImageData') as string;
+        const pageNum = parseInt(formData.get('signaturePageNum') as string, 10);
+        const xPos = parseInt(formData.get('signatureX') as string, 10);
+        const yPos = parseInt(formData.get('signatureY') as string, 10);
+        const sigWidth = parseInt(formData.get('signatureWidth') as string, 10);
+        const sigHeight = parseInt(formData.get('signatureHeight') as string, 10);
+
+        if (!signatureImgData || isNaN(pageNum) || isNaN(xPos) || isNaN(yPos)) {
+            return { error: 'Missing required signature data.' };
+        }
+        if (pageNum < 1 || pageNum > pageCount) {
+             return { error: 'Invalid page number for signature.' };
+        }
+        
+        const page = pdfDoc.getPage(pageNum - 1);
+        const signatureImage = await pdfDoc.embedPng(signatureImgData);
+
+        page.drawImage(signatureImage, {
+            x: xPos,
+            y: yPos,
+            width: sigWidth,
+            height: sigHeight,
+        });
+
+        const pdfBytes = await pdfDoc.save();
+        return {
+            fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
+            fileName: `signed-${file.name}`,
+            pageCount,
+        };
+    }
     
     if (operation === 'flatten') {
         const form = pdfDoc.getForm();
@@ -104,7 +134,8 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
         const pdfBytes = await pdfDoc.save();
         return {
             fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
-            fileName: `flattened-${file.name}`
+            fileName: `flattened-${file.name}`,
+             pageCount,
         };
     }
 
@@ -150,7 +181,8 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
         const pdfBytes = await pdfDoc.save();
         return {
             fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
-            fileName: `edited-${file.name}`
+            fileName: `edited-${file.name}`,
+             pageCount,
         };
     }
 
@@ -176,7 +208,8 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
         const pdfBytes = await pdfDoc.save();
         return {
             fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
-            fileName: `numbered-${file.name}`
+            fileName: `numbered-${file.name}`,
+             pageCount,
         };
     }
     
@@ -197,7 +230,8 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
         const pdfBytes = await newDoc.save();
         return {
             fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
-            fileName: `rearranged-${file.name}`
+            fileName: `rearranged-${file.name}`,
+             pageCount,
         };
     }
 
@@ -207,7 +241,8 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
       const pdfBytes = await pdfDoc.save();
       return {
         fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
-        fileName: `rotated-${file.name}`
+        fileName: `rotated-${file.name}`,
+         pageCount,
       };
     }
 
@@ -234,7 +269,8 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
       const actionName = operation === 'extract' ? 'extracted' : 'split';
       return {
         fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
-        fileName: `${actionName}-${file.name}`
+        fileName: `${actionName}-${file.name}`,
+        pageCount,
       };
     }
 
@@ -251,7 +287,8 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
         const pdfBytes = await pdfDoc.save();
         return {
             fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
-            fileName: `protected-${file.name}`
+            fileName: `protected-${file.name}`,
+             pageCount,
         };
     }
 
@@ -280,14 +317,18 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
         const pdfBytes = await pdfDoc.save();
         return {
             fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
-            fileName: `watermarked-${file.name}`
+            fileName: `watermarked-${file.name}`,
+             pageCount,
         };
     }
 
-
-    return { error: "Invalid operation specified." };
+    return { error: "Invalid operation specified.", pageCount };
   } catch (err: any) {
-    console.error("Failed to organize PDF:", err);
-    return { error: `An error occurred during processing: ${err.message}` };
+    console.error("Failed to process PDF:", err);
+    let message = `An error occurred during processing: ${err.message}`;
+    if (err.message.includes('encrypted')) {
+        message = "This PDF is password-protected. Please unlock it first using the 'Unlock' tool."
+    }
+    return { error: message };
   }
 }

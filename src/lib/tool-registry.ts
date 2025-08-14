@@ -51,6 +51,7 @@ import {
   TextQuote,
   Info,
   Combine,
+  Pencil,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -178,7 +179,7 @@ const allTools: Tool[] = [
     id: "pdf-editor",
     name: "PDF Editor",
     slug: "pdf-editor",
-    description: "Split, rotate, extract pages, rearrange, add page numbers, watermarks, flatten, headers, footers, and manage passwords.",
+    description: "Sign, split, rotate, extract pages, rearrange, add page numbers, watermarks, flatten, headers, footers, and manage passwords.",
     category: "PDF Tools",
     categorySlug: "pdf-tools",
     href: "/tools/pdf-editor",
