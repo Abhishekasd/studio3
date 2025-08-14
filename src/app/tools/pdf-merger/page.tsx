@@ -1,44 +1,14 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, Download, FilePlus2, Loader2, X, Trash2, File as FileIcon } from "lucide-react";
-import { PDFDocument } from 'pdf-lib';
-
-async function mergePdfs(prevState: any, formData: FormData): Promise<{ mergedPdfDataUri?: string; error?: string }> {
-  'use server';
-  
-  const files = formData.getAll("pdfs") as File[];
-
-  if (files.length < 2) {
-    return { error: "Please select at least two PDF files to merge." };
-  }
-
-  try {
-    const mergedPdf = await PDFDocument.create();
-    for (const file of files) {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await PDFDocument.load(arrayBuffer);
-      const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-      copiedPages.forEach((page) => {
-        mergedPdf.addPage(page);
-      });
-    }
-
-    const mergedPdfBytes = await mergedPdf.save();
-    const mergedPdfDataUri = `data:application/pdf;base64,${Buffer.from(mergedPdfBytes).toString('base64')}`;
-    
-    return { mergedPdfDataUri };
-  } catch (err: any) {
-    console.error("Failed to merge PDFs:", err);
-    return { error: `An error occurred during merging: ${err.message}` };
-  }
-}
+import { mergePdfs } from './actions';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -90,14 +60,14 @@ export default function PdfMergerPage() {
     document.body.removeChild(link);
   };
 
-  useState(() => {
-    if (state.error) {
+  useEffect(() => {
+    if (state?.error) {
        toast({ variant: "destructive", title: "Merge Failed", description: state.error });
     }
-    if (state.mergedPdfDataUri) {
+    if (state?.mergedPdfDataUri) {
          toast({ title: "Merge Successful!", description: "Your PDF has been merged and is ready for download." });
     }
-  }, [state]);
+  }, [state, toast]);
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6">
@@ -153,12 +123,12 @@ export default function PdfMergerPage() {
                 )}
                 
                 {state.mergedPdfDataUri && (
-                    <Button onClick={handleDownload} variant="secondary" className="w-full">
+                    <Button onClick={handleDownload} variant="secondary" className="w-full" type="button">
                         <Download className="mr-2 h-4 w-4" /> Download Merged PDF
                     </Button>
                 )}
                  {selectedFiles.length > 0 && (
-                    <Button onClick={() => setSelectedFiles([])} variant="outline" className="w-full">
+                    <Button onClick={() => setSelectedFiles([])} variant="outline" className="w-full" type="button">
                         <Trash2 className="mr-2 h-4 w-4" /> Clear All Files
                     </Button>
                 )}

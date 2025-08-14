@@ -1,64 +1,14 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, Download, FileText, Loader2, Trash2 } from "lucide-react";
-import type { Buffer } from 'buffer';
-
-// Lazily import docx-pdf to handle environments where it might fail
-let docx: ((buffer: Buffer, callback: (err: any, result: Buffer | null) => void) => void) | null = null;
-try {
-  docx = require('docx-pdf');
-} catch (e) {
-  console.error("Could not load docx-pdf library. The Word to PDF tool may not be available.", e);
-}
-
-
-async function convertWordToPdf(prevState: any, formData: FormData): Promise<{ pdfDataUri?: string; error?: string }> {
-  'use server';
-  
-  if (!docx) {
-    return { error: "The converter is not available in this environment due to incompatible dependencies. This feature works best in a local development setup." };
-  }
-
-  const file = formData.get("doc") as File;
-
-  if (!file || file.size === 0) {
-    return { error: "Please select a Word document to convert." };
-  }
-  
-  if (file.type !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-     return { error: "Invalid file type. Please upload a .docx file." };
-  }
-
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    
-    return new Promise((resolve) => {
-        docx!(buffer, (err, result) => {
-            if (err) {
-                console.error("Conversion error:", err);
-                resolve({ error: "Failed to convert the document. It might be corrupted or in an unsupported format." });
-            } else if (result) {
-                 const pdfDataUri = `data:application/pdf;base64,${result.toString('base64')}`;
-                 resolve({ pdfDataUri });
-            } else {
-                 resolve({ error: "Conversion resulted in an empty file." });
-            }
-        });
-    });
-    
-  } catch (err: any) {
-    console.error("Failed to process file:", err);
-    return { error: `An error occurred during conversion: ${err.message}` };
-  }
-}
+import { convertWordToPdf } from './actions';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -111,14 +61,14 @@ export default function WordToPdfPage() {
     }
   }
 
-  useState(() => {
-    if (state.error) {
+  useEffect(() => {
+    if (state?.error) {
        toast({ variant: "destructive", title: "Conversion Failed", description: state.error });
     }
-    if (state.pdfDataUri) {
+    if (state?.pdfDataUri) {
          toast({ title: "Conversion Successful!", description: "Your PDF is ready for download." });
     }
-  }, [state]);
+  }, [state, toast]);
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6">
@@ -161,7 +111,7 @@ export default function WordToPdfPage() {
                 )}
                 
                 {state.pdfDataUri && (
-                    <Button onClick={handleDownload} variant="secondary" className="w-full">
+                    <Button onClick={handleDownload} variant="secondary" className="w-full" type="button">
                         <Download className="mr-2 h-4 w-4" /> Download PDF
                     </Button>
                 )}
