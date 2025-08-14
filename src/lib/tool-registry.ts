@@ -37,6 +37,7 @@ import {
   Coins,
   Timer,
   Keyboard,
+  Layers,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -117,6 +118,20 @@ const toolCategories: ToolCategory[] = [
 ];
 
 const allTools: Tool[] = [
+  {
+    id: "organize-pdf",
+    name: "Organize PDF",
+    slug: "organize-pdf",
+    description: "Split, rotate, and extract pages from PDF files.",
+    category: "PDF Tools",
+    categorySlug: "pdf-tools",
+    href: "/tools/organize-pdf",
+    icon: Layers,
+    is_featured: true,
+    popularity_score: 98,
+    created_at: new Date("2024-08-25T10:00:00Z"),
+    last_updated: new Date("2024-08-25T10:00:00Z"),
+  },
   {
     id: "plagiarism-checker",
     name: "Plagiarism Checker",
