@@ -7,24 +7,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Download, Loader2, Trash2, Layers, RotateCw, Scissors, AppWindow, Lock, BadgePercent, Shuffle, Unlock } from "lucide-react";
+import { Upload, Download, Loader2, Trash2, Layers, RotateCw, Scissors, Lock, Shuffle, Unlock, Hash, BadgePercent } from "lucide-react";
 import { processPdf } from './actions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-type Operation = "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange" | "unlock";
+type Operation = "split" | "rotate" | "extract" | "rearrange" | "add-page-numbers" | "watermark" | "password" | "unlock";
 
 function SubmitButton({ operation }: { operation: Operation }) {
   const { pending } = useFormStatus();
   const icons = {
-      split: <AppWindow className="mr-2 h-4 w-4" />,
+      split: <Layers className="mr-2 h-4 w-4" />,
       rotate: <RotateCw className="mr-2 h-4 w-4" />,
       extract: <Scissors className="mr-2 h-4 w-4" />,
       password: <Lock className="mr-2 h-4 w-4" />,
       watermark: <BadgePercent className="mr-2 h-4 w-4" />,
       rearrange: <Shuffle className="mr-2 h-4 w-4" />,
       unlock: <Unlock className="mr-2 h-4 w-4" />,
+      'add-page-numbers': <Hash className="mr-2 h-4 w-4" />,
   }
   const text = {
       split: 'Split PDF',
@@ -34,6 +35,7 @@ function SubmitButton({ operation }: { operation: Operation }) {
       watermark: 'Add Watermark',
       rearrange: 'Rearrange PDF',
       unlock: 'Unlock PDF',
+      'add-page-numbers': 'Add Page Numbers'
   }
   return (
     <Button type="submit" disabled={pending} className="w-full">
@@ -133,11 +135,10 @@ export default function PdfEditorPage() {
                             <TabsTrigger value="split">Split</TabsTrigger>
                             <TabsTrigger value="rotate">Rotate</TabsTrigger>
                             <TabsTrigger value="extract">Extract</TabsTrigger>
-                            <TabsTrigger value="rearrange">Rearrange</TabsTrigger>
-                        </TabsList>
-                         <TabsList className="grid w-full grid-cols-3 mt-2">
-                            <TabsTrigger value="password">Add Password</TabsTrigger>
-                            <TabsTrigger value="watermark">Add Watermark</TabsTrigger>
+                             <TabsTrigger value="rearrange">Rearrange</TabsTrigger>
+                             <TabsTrigger value="add-page-numbers">Page #</TabsTrigger>
+                            <TabsTrigger value="watermark">Watermark</TabsTrigger>
+                            <TabsTrigger value="password">Password</TabsTrigger>
                             <TabsTrigger value="unlock">Unlock</TabsTrigger>
                         </TabsList>
                         <input type="hidden" name="operation" value={activeTab} />
@@ -211,6 +212,13 @@ export default function PdfEditorPage() {
                                <p className="text-xs text-muted-foreground">This text will be diagonally overlaid on each page.</p>
                            </div>
                             <SubmitButton operation="watermark" />
+                        </TabsContent>
+
+                         <TabsContent value="add-page-numbers" className="space-y-4 pt-4">
+                           <div className="text-center">
+                             <p className="text-sm text-muted-foreground">Page numbers will be added to the bottom-center of each page.</p>
+                           </div>
+                            <SubmitButton operation="add-page-numbers" />
                         </TabsContent>
                     </Tabs>
                 )}

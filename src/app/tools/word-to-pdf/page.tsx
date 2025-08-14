@@ -47,7 +47,7 @@ export default function WordToPdfPage() {
     if (!state.pdfDataUri || !selectedFile) return;
     const link = document.createElement("a");
     link.href = state.pdfDataUri;
-    const newName = selectedFile.name.replace(/\.docx$/, '.pdf');
+    const newName = selectedFile.name.replace(/\.docx?$/, '.pdf');
     link.download = newName;
     document.body.appendChild(link);
     link.click();
@@ -81,14 +81,14 @@ export default function WordToPdfPage() {
         <form action={formAction}>
             <CardHeader>
                 <CardTitle>Upload Word Document</CardTitle>
-                <CardDescription>Select the .docx file you want to convert.</CardDescription>
+                <CardDescription>Select the .doc or .docx file you want to convert.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-8 text-center">
                     <label htmlFor="file-upload" className="cursor-pointer">
                         <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
                         <p className="mt-4 text-muted-foreground">{selectedFile ? `Selected: ${selectedFile.name}`: "Click to browse or drag and drop"}</p>
-                         <p className="text-xs text-muted-foreground">.docx files only</p>
+                         <p className="text-xs text-muted-foreground">.doc, .docx files only</p>
                     </label>
                     <Input
                         id="file-upload"
@@ -96,7 +96,7 @@ export default function WordToPdfPage() {
                         type="file"
                         className="hidden"
                         onChange={handleFileChange}
-                        accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     />
                 </div>
                 

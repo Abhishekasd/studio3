@@ -30,7 +30,6 @@ import {
   Pipette,
   FilePlus2,
   FileArchive,
-  FileText as FileWord,
   Scissors,
   ScanText,
   Coins,
@@ -47,6 +46,8 @@ import {
   FileCode,
   Edit,
   Scan,
+  Hash,
+  Unlock,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -160,7 +161,7 @@ const allTools: Tool[] = [
     id: "pdf-editor",
     name: "PDF Editor",
     slug: "pdf-editor",
-    description: "Split, rotate, extract pages, rearrange, add watermarks, and manage passwords.",
+    description: "Split, rotate, extract pages, rearrange, add page numbers, watermarks, and manage passwords.",
     category: "PDF Tools",
     categorySlug: "pdf-tools",
     href: "/tools/pdf-editor",
@@ -208,7 +209,7 @@ const allTools: Tool[] = [
     category: "PDF Tools",
     categorySlug: "pdf-tools",
     href: "/tools/word-to-pdf",
-    icon: FileWord,
+    icon: FileText,
     is_featured: true,
     popularity_score: 97,
     created_at: new Date("2024-08-11T10:00:00Z"),

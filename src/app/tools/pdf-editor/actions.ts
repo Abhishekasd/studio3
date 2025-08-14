@@ -63,7 +63,7 @@ function parsePageOrder(orderStr: string, maxPages: number): number[] | { error:
 
 export async function processPdf(prevState: any, formData: FormData): Promise<PdfEditorState> {
   const file = formData.get("pdf") as File;
-  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange" | "unlock";
+  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange" | "unlock" | "add-page-numbers";
   
   if (!file || file.size === 0) {
     return { error: "Please select a PDF file." };
@@ -98,6 +98,32 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const pageCount = pdfDoc.getPageCount();
 
+    if (operation === 'add-page-numbers') {
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const pages = pdfDoc.getPages();
+
+        for (let i = 0; i < pages.length; i++) {
+            const page = pages[i];
+            const { width, height } = page.getSize();
+            const pageNumberText = `${i + 1} / ${pageCount}`;
+            const textSize = 10;
+            const textWidth = font.widthOfTextAtSize(pageNumberText, textSize);
+
+            page.drawText(pageNumberText, {
+                x: width / 2 - textWidth / 2,
+                y: 20,
+                font,
+                size: textSize,
+                color: rgb(0.5, 0.5, 0.5),
+            });
+        }
+        const pdfBytes = await pdfDoc.save();
+        return {
+            fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
+            fileName: `numbered-${file.name}`
+        };
+    }
+    
     if (operation === 'rearrange') {
         const pageOrderInput = formData.get("pageOrder") as string;
         if (!pageOrderInput) {
