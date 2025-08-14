@@ -45,6 +45,7 @@ import {
   Globe,
   Camera,
   FileCode,
+  Edit,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -125,6 +126,20 @@ const toolCategories: ToolCategory[] = [
 ];
 
 const allTools: Tool[] = [
+  {
+    id: 'pdf-form-filler',
+    name: 'PDF Form Filler',
+    slug: 'pdf-form-filler',
+    description: 'Fill out PDF forms directly in your browser.',
+    category: 'PDF Tools',
+    categorySlug: 'pdf-tools',
+    href: '/tools/pdf-form-filler',
+    icon: Edit,
+    is_featured: true,
+    popularity_score: 99,
+    created_at: new Date('2024-09-07T10:00:00Z'),
+    last_updated: new Date('2024-09-07T10:00:00Z'),
+  },
   {
     id: "pdf-editor",
     name: "PDF Editor",
