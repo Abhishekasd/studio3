@@ -41,6 +41,7 @@ import {
   FileEdit,
   FileDown,
   FileSpreadsheet,
+  Presentation,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -192,6 +193,20 @@ const allTools: Tool[] = [
     popularity_score: 96,
     created_at: new Date("2024-08-30T10:00:00Z"),
     last_updated: new Date("2024-08-30T10:00:00Z"),
+  },
+  {
+    id: 'powerpoint-to-pdf',
+    name: 'PowerPoint to PDF',
+    slug: 'powerpoint-to-pdf',
+    description: 'Convert PowerPoint (.pptx) presentations to PDF.',
+    category: 'PDF Tools',
+    categorySlug: 'pdf-tools',
+    href: '/tools/powerpoint-to-pdf',
+    icon: Presentation,
+    is_featured: true,
+    popularity_score: 95,
+    created_at: new Date('2024-08-31T10:00:00Z'),
+    last_updated: new Date('2024-08-31T10:00:00Z'),
   },
   {
     id: "pdf-to-word",
