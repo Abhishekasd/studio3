@@ -1,17 +1,17 @@
 
 'use server';
 
-import { PDFDocument, degrees } from 'pdf-lib';
+import { PDFDocument, degrees, rgb, StandardFonts } from 'pdf-lib';
 
-interface OrganizePdfState {
+interface PdfEditorState {
   fileDataUri?: string;
   fileName?: string;
   error?: string;
 }
 
-export async function organizePdf(prevState: any, formData: FormData): Promise<OrganizePdfState> {
+export async function processPdf(prevState: any, formData: FormData): Promise<PdfEditorState> {
   const file = formData.get("pdf") as File;
-  const operation = formData.get("operation") as "split" | "rotate" | "extract";
+  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark";
   
   if (!file || file.size === 0) {
     return { error: "Please select a PDF file." };
@@ -73,7 +73,52 @@ export async function organizePdf(prevState: any, formData: FormData): Promise<O
                 fileName: `split-page-1-${file.name}`
             };
         }
-        // Add range splitting logic here if needed in future
+    }
+
+    if(operation === 'password') {
+        const password = formData.get('password') as string;
+        if (!password) {
+            return { error: 'Password cannot be empty.'}
+        }
+        pdfDoc.encrypt({
+            userPassword: password,
+            ownerPassword: password,
+            permissions: {},
+        });
+        const pdfBytes = await pdfDoc.save();
+        return {
+            fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
+            fileName: `protected-${file.name}`
+        };
+    }
+
+    if(operation === 'watermark') {
+        const watermarkText = formData.get('watermarkText') as string;
+        if (!watermarkText) {
+            return { error: 'Watermark text cannot be empty.'}
+        }
+        
+        const pages = pdfDoc.getPages();
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+        for (const page of pages) {
+            const { width, height } = page.getSize();
+            page.drawText(watermarkText, {
+                x: width / 2 - 150,
+                y: height / 2,
+                font,
+                size: 50,
+                color: rgb(0.75, 0.75, 0.75),
+                opacity: 0.5,
+                rotate: degrees(45),
+            });
+        }
+        
+        const pdfBytes = await pdfDoc.save();
+        return {
+            fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
+            fileName: `watermarked-${file.name}`
+        };
     }
 
 

@@ -7,13 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Download, Loader2, Trash2, File as FileIcon, Layers, RotateCw, Scissors, AppWindow } from "lucide-react";
-import { organizePdf } from './actions';
+import { Upload, Download, Loader2, Trash2, Layers, RotateCw, Scissors, AppWindow, Lock, BadgePercent } from "lucide-react";
+import { processPdf } from './actions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-type Operation = "split" | "rotate" | "extract";
+type Operation = "split" | "rotate" | "extract" | "password" | "watermark";
 
 function SubmitButton({ operation }: { operation: Operation }) {
   const { pending } = useFormStatus();
@@ -21,11 +21,15 @@ function SubmitButton({ operation }: { operation: Operation }) {
       split: <AppWindow className="mr-2 h-4 w-4" />,
       rotate: <RotateCw className="mr-2 h-4 w-4" />,
       extract: <Scissors className="mr-2 h-4 w-4" />,
+      password: <Lock className="mr-2 h-4 w-4" />,
+      watermark: <BadgePercent className="mr-2 h-4 w-4" />,
   }
   const text = {
       split: 'Split PDF',
       rotate: 'Rotate PDF',
       extract: 'Extract Pages',
+      password: 'Add Password',
+      watermark: 'Add Watermark',
   }
   return (
     <Button type="submit" disabled={pending} className="w-full">
@@ -44,8 +48,8 @@ function SubmitButton({ operation }: { operation: Operation }) {
   );
 }
 
-export default function OrganizePdfPage() {
-  const [state, formAction] = useFormState(organizePdf, {});
+export default function PdfEditorPage() {
+  const [state, formAction] = useFormState(processPdf, {});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [activeTab, setActiveTab] = useState<Operation>("split");
   const { toast } = useToast();
@@ -55,8 +59,7 @@ export default function OrganizePdfPage() {
       const file = event.target.files[0];
        if(file.type === 'application/pdf') {
          setSelectedFile(file);
-         // Clear previous results when new file is selected
-         formAction(new FormData()); 
+         formAction({}); 
        } else {
         toast({ variant: "destructive", title: "Invalid File Type", description: "Only PDF files are accepted." });
         handleClear();
@@ -78,7 +81,7 @@ export default function OrganizePdfPage() {
     setSelectedFile(null);
     const fileInput = document.getElementById('file-upload') as HTMLInputElement;
     if (fileInput) fileInput.value = "";
-    formAction(new FormData()); // clear state
+    formAction({});
   }
 
   useEffect(() => {
@@ -93,13 +96,13 @@ export default function OrganizePdfPage() {
   return (
     <div className="container mx-auto px-4 py-8 md:px-6">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold font-headline">Organize PDF</h1>
-        <p className="text-muted-foreground text-lg">Split, rotate, or extract pages from your PDF files.</p>
+        <h1 className="text-4xl font-bold font-headline">PDF Editor</h1>
+        <p className="text-muted-foreground text-lg">Organize, secure, and modify your PDF files with ease.</p>
       </div>
 
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
-            <CardTitle>Organize Your PDF</CardTitle>
+            <CardTitle>Edit Your PDF</CardTitle>
             <CardDescription>Upload your file, choose an operation, and process your PDF.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -126,6 +129,10 @@ export default function OrganizePdfPage() {
                             <TabsTrigger value="split">Split</TabsTrigger>
                             <TabsTrigger value="rotate">Rotate</TabsTrigger>
                             <TabsTrigger value="extract">Extract</TabsTrigger>
+                        </TabsList>
+                         <TabsList className="grid w-full grid-cols-2 mt-2">
+                            <TabsTrigger value="password">Add Password</TabsTrigger>
+                            <TabsTrigger value="watermark">Add Watermark</TabsTrigger>
                         </TabsList>
                         <input type="hidden" name="operation" value={activeTab} />
                         
@@ -159,6 +166,24 @@ export default function OrganizePdfPage() {
                                <p className="text-xs text-muted-foreground">Enter page numbers or ranges, separated by commas.</p>
                            </div>
                             <SubmitButton operation="extract" />
+                        </TabsContent>
+
+                         <TabsContent value="password" className="space-y-4 pt-4">
+                           <div className="grid gap-2">
+                               <Label htmlFor="password">Password</Label>
+                               <Input name="password" id="password" type="password" placeholder="Enter a strong password" required/>
+                               <p className="text-xs text-muted-foreground">The password will be required to open the PDF.</p>
+                           </div>
+                            <SubmitButton operation="password" />
+                        </TabsContent>
+
+                         <TabsContent value="watermark" className="space-y-4 pt-4">
+                           <div className="grid gap-2">
+                               <Label htmlFor="watermarkText">Watermark Text</Label>
+                               <Input name="watermarkText" id="watermarkText" placeholder="e.g., CONFIDENTIAL" required/>
+                               <p className="text-xs text-muted-foreground">This text will be diagonally overlaid on each page.</p>
+                           </div>
+                            <SubmitButton operation="watermark" />
                         </TabsContent>
                     </Tabs>
                 )}
