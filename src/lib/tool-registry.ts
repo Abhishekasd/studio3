@@ -40,6 +40,7 @@ import {
   FileUp,
   FileEdit,
   FileDown,
+  FileSpreadsheet,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -177,6 +178,20 @@ const allTools: Tool[] = [
     popularity_score: 97,
     created_at: new Date("2024-08-11T10:00:00Z"),
     last_updated: new Date("2024-08-11T10:00:00Z"),
+  },
+  {
+    id: "excel-to-pdf",
+    name: "Excel to PDF",
+    slug: "excel-to-pdf",
+    description: "Convert Microsoft Excel (.xlsx) files to PDF.",
+    category: "PDF Tools",
+    categorySlug: "pdf-tools",
+    href: "/tools/excel-to-pdf",
+    icon: FileSpreadsheet,
+    is_featured: true,
+    popularity_score: 96,
+    created_at: new Date("2024-08-30T10:00:00Z"),
+    last_updated: new Date("2024-08-30T10:00:00Z"),
   },
   {
     id: "pdf-to-word",
@@ -560,3 +575,5 @@ export async function getTools(): Promise<Tool[]> {
 export async function getToolCategories(): Promise<ToolCategory[]> {
   return Promise.resolve(toolCategories);
 }
+
+    
