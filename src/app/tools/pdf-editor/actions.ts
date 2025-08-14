@@ -63,7 +63,7 @@ function parsePageOrder(orderStr: string, maxPages: number): number[] | { error:
 
 export async function processPdf(prevState: any, formData: FormData): Promise<PdfEditorState> {
   const file = formData.get("pdf") as File;
-  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange" | "unlock" | "add-page-numbers";
+  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange" | "unlock" | "add-page-numbers" | "header-footer";
   
   if (!file || file.size === 0) {
     return { error: "Please select a PDF file." };
@@ -97,6 +97,52 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
     
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const pageCount = pdfDoc.getPageCount();
+
+     if (operation === 'header-footer') {
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const fontSize = 10;
+        const margin = 30;
+
+        const headerLeft = formData.get('headerLeft') as string || '';
+        const headerCenter = formData.get('headerCenter') as string || '';
+        const headerRight = formData.get('headerRight') as string || '';
+        const footerLeft = formData.get('footerLeft') as string || '';
+        const footerCenter = formData.get('footerCenter') as string || '';
+        const footerRight = formData.get('footerRight') as string || '';
+
+        const pages = pdfDoc.getPages();
+        for (let i = 0; i < pages.length; i++) {
+            const page = pages[i];
+            const { width, height } = page.getSize();
+            
+            // --- Header ---
+            if (headerLeft) page.drawText(headerLeft, { x: margin, y: height - margin, font, size: fontSize });
+            if (headerCenter) {
+                const textWidth = font.widthOfTextAtSize(headerCenter, fontSize);
+                page.drawText(headerCenter, { x: width / 2 - textWidth / 2, y: height - margin, font, size: fontSize });
+            }
+            if (headerRight) {
+                 const textWidth = font.widthOfTextAtSize(headerRight, fontSize);
+                page.drawText(headerRight, { x: width - textWidth - margin, y: height - margin, font, size: fontSize });
+            }
+
+            // --- Footer ---
+            if (footerLeft) page.drawText(footerLeft, { x: margin, y: margin, font, size: fontSize });
+            if (footerCenter) {
+                const textWidth = font.widthOfTextAtSize(footerCenter, fontSize);
+                page.drawText(footerCenter, { x: width / 2 - textWidth / 2, y: margin, font, size: fontSize });
+            }
+            if (footerRight) {
+                const textWidth = font.widthOfTextAtSize(footerRight, fontSize);
+                page.drawText(footerRight, { x: width - textWidth - margin, y: margin, font, size: fontSize });
+            }
+        }
+        const pdfBytes = await pdfDoc.save();
+        return {
+            fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
+            fileName: `edited-${file.name}`
+        };
+    }
 
     if (operation === 'add-page-numbers') {
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica);

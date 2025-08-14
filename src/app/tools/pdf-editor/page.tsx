@@ -7,13 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Download, Loader2, Trash2, Layers, RotateCw, Scissors, Lock, Shuffle, Unlock, Hash, BadgePercent } from "lucide-react";
+import { Upload, Download, Loader2, Trash2, Layers, RotateCw, Scissors, Lock, Shuffle, Unlock, Hash, BadgePercent, TextQuote } from "lucide-react";
 import { processPdf } from './actions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-type Operation = "split" | "rotate" | "extract" | "rearrange" | "add-page-numbers" | "watermark" | "password" | "unlock";
+type Operation = "split" | "rotate" | "extract" | "rearrange" | "add-page-numbers" | "watermark" | "password" | "unlock" | "header-footer";
 
 function SubmitButton({ operation }: { operation: Operation }) {
   const { pending } = useFormStatus();
@@ -26,6 +26,7 @@ function SubmitButton({ operation }: { operation: Operation }) {
       rearrange: <Shuffle className="mr-2 h-4 w-4" />,
       unlock: <Unlock className="mr-2 h-4 w-4" />,
       'add-page-numbers': <Hash className="mr-2 h-4 w-4" />,
+      'header-footer': <TextQuote className="mr-2 h-4 w-4" />
   }
   const text = {
       split: 'Split PDF',
@@ -35,7 +36,8 @@ function SubmitButton({ operation }: { operation: Operation }) {
       watermark: 'Add Watermark',
       rearrange: 'Rearrange PDF',
       unlock: 'Unlock PDF',
-      'add-page-numbers': 'Add Page Numbers'
+      'add-page-numbers': 'Add Page Numbers',
+      'header-footer': 'Add Header/Footer'
   }
   return (
     <Button type="submit" disabled={pending} className="w-full">
@@ -131,7 +133,7 @@ export default function PdfEditorPage() {
 
                 {selectedFile && (
                     <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as Operation)} className="w-full">
-                        <TabsList className="grid w-full grid-cols-4">
+                        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
                             <TabsTrigger value="split">Split</TabsTrigger>
                             <TabsTrigger value="rotate">Rotate</TabsTrigger>
                             <TabsTrigger value="extract">Extract</TabsTrigger>
@@ -140,6 +142,7 @@ export default function PdfEditorPage() {
                             <TabsTrigger value="watermark">Watermark</TabsTrigger>
                             <TabsTrigger value="password">Password</TabsTrigger>
                             <TabsTrigger value="unlock">Unlock</TabsTrigger>
+                            <TabsTrigger value="header-footer">Header/Footer</TabsTrigger>
                         </TabsList>
                         <input type="hidden" name="operation" value={activeTab} />
                         
@@ -220,6 +223,28 @@ export default function PdfEditorPage() {
                            </div>
                             <SubmitButton operation="add-page-numbers" />
                         </TabsContent>
+                        
+                        <TabsContent value="header-footer" className="space-y-4 pt-4">
+                            <div className='space-y-2'>
+                                <Label>Header</Label>
+                                <div className='grid grid-cols-3 gap-2'>
+                                    <Input name="headerLeft" placeholder="Left" />
+                                    <Input name="headerCenter" placeholder="Center" />
+                                    <Input name="headerRight" placeholder="Right" />
+                                </div>
+                            </div>
+                             <div className='space-y-2'>
+                                <Label>Footer</Label>
+                                <div className='grid grid-cols-3 gap-2'>
+                                    <Input name="footerLeft" placeholder="Left" />
+                                    <Input name="footerCenter" placeholder="Center" />
+                                    <Input name="footerRight" placeholder="Right" />
+                                </div>
+                            </div>
+                           <p className="text-xs text-muted-foreground text-center">Leave fields blank that you don't need.</p>
+                           <SubmitButton operation="header-footer" />
+                        </TabsContent>
+
                     </Tabs>
                 )}
                 
