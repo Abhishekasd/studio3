@@ -39,6 +39,7 @@ import {
   Layers,
   FileUp,
   FileEdit,
+  FileDown,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -176,6 +177,33 @@ const allTools: Tool[] = [
     popularity_score: 97,
     created_at: new Date("2024-08-11T10:00:00Z"),
     last_updated: new Date("2024-08-11T10:00:00Z"),
+  },
+  {
+    id: "pdf-to-word",
+    name: "PDF to Word Converter",
+    slug: "pdf-to-word",
+    description: "Convert PDF documents to editable Word (.docx) files.",
+    category: "PDF Tools",
+    categorySlug: "pdf-tools",
+    href: "/tools/pdf-to-word",
+    icon: FileDown,
+    is_featured: true,
+    popularity_score: 97,
+    created_at: new Date("2024-08-29T10:00:00Z"),
+    last_updated: new Date("2024-08-29T10:00:00Z"),
+  },
+   {
+    id: "pdf-to-text",
+    name: "PDF to Text Extractor",
+    slug: "pdf-to-text",
+    description: "Extract plain text from your PDF files.",
+    category: "PDF Tools",
+    categorySlug: "pdf-tools",
+    href: "/tools/pdf-to-text",
+    icon: Type,
+    popularity_score: 85,
+    created_at: new Date("2024-08-29T11:00:00Z"),
+    last_updated: new Date("2024-08-29T11:00:00Z"),
   },
   {
     id: "pdf-merger",
