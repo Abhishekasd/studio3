@@ -42,6 +42,7 @@ import {
   FileDown,
   FileSpreadsheet,
   Presentation,
+  Globe,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -262,6 +263,20 @@ const allTools: Tool[] = [
     is_featured: false,
     created_at: new Date("2024-09-01T10:00:00Z"),
     last_updated: new Date("2024-09-01T10:00:00Z"),
+  },
+   {
+    id: "html-to-pdf",
+    name: "HTML to PDF Converter",
+    slug: "html-to-pdf",
+    description: "Convert any live webpage into a PDF document.",
+    category: "PDF Tools",
+    categorySlug: "pdf-tools",
+    href: "/tools/html-to-pdf",
+    icon: Globe,
+    popularity_score: 94,
+    is_featured: true,
+    created_at: new Date("2024-09-02T10:00:00Z"),
+    last_updated: new Date("2024-09-02T10:00:00Z"),
   },
   {
     id: "password-generator",
