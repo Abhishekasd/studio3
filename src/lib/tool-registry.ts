@@ -49,6 +49,7 @@ import {
   Hash,
   Unlock,
   TextQuote,
+  Info,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -129,6 +130,20 @@ const toolCategories: ToolCategory[] = [
 ];
 
 const allTools: Tool[] = [
+  {
+    id: 'pdf-metadata-editor',
+    name: 'PDF Metadata Editor',
+    slug: 'pdf-metadata-editor',
+    description: 'View and edit PDF metadata such as author, title, and subject.',
+    category: 'PDF Tools',
+    categorySlug: 'pdf-tools',
+    href: '/tools/pdf-metadata-editor',
+    icon: Info,
+    is_featured: true,
+    popularity_score: 98,
+    created_at: new Date('2024-09-09T10:00:00Z'),
+    last_updated: new Date('2024-09-09T10:00:00Z'),
+  },
   {
     id: 'pdf-ocr',
     name: 'PDF OCR',
