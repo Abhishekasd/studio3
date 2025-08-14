@@ -137,8 +137,11 @@ export default function PdfEditorPage() {
                         <input type="hidden" name="operation" value={activeTab} />
                         
                         <TabsContent value="split" className="space-y-4 pt-4">
-                           <input type="hidden" name="splitType" value="all" />
-                           <CardDescription className="text-center">Split every page of the PDF into separate files. The result will be downloaded as a ZIP archive (currently returns first page only).</CardDescription>
+                           <div className="grid gap-2">
+                               <Label htmlFor="pagesToSplit">Pages to Split</Label>
+                               <Input name="pagesToSplit" id="pagesToSplit" placeholder="e.g., 1-3, 5" required/>
+                               <p className="text-xs text-muted-foreground">Enter page numbers or a range (e.g., 2-5) to create a new PDF from.</p>
+                           </div>
                            <SubmitButton operation="split" />
                         </TabsContent>
 

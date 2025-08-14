@@ -9,6 +9,34 @@ interface PdfEditorState {
   error?: string;
 }
 
+// Helper function to parse page ranges like "1, 3-5, 8"
+function parsePageRanges(rangeStr: string, maxPages: number): number[] {
+  const pages = new Set<number>();
+  const ranges = rangeStr.split(',');
+
+  for (const range of ranges) {
+    const trimmedRange = range.trim();
+    if (trimmedRange.includes('-')) {
+      const [start, end] = trimmedRange.split('-').map(s => parseInt(s.trim(), 10));
+      if (!isNaN(start) && !isNaN(end) && start <= end) {
+        for (let i = start; i <= end; i++) {
+          if (i > 0 && i <= maxPages) {
+            pages.add(i - 1); // convert to 0-based index
+          }
+        }
+      }
+    } else {
+      const pageNum = parseInt(trimmedRange, 10);
+      if (!isNaN(pageNum) && pageNum > 0 && pageNum <= maxPages) {
+        pages.add(pageNum - 1); // convert to 0-based index
+      }
+    }
+  }
+
+  return Array.from(pages).sort((a, b) => a - b);
+}
+
+
 export async function processPdf(prevState: any, formData: FormData): Promise<PdfEditorState> {
   const file = formData.get("pdf") as File;
   const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark";
@@ -35,44 +63,31 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
       };
     }
 
-    if (operation === 'extract') {
-      const pagesToExtract = (formData.get("pagesToExtract") as string)
-        .split(',')
-        .map(s => parseInt(s.trim(), 10))
-        .filter(n => !isNaN(n) && n > 0 && n <= pageCount)
-        .map(n => n - 1); // convert to 0-based index
+    if (operation === 'extract' || operation === 'split') {
+        const pagesInput = (operation === 'extract' 
+            ? formData.get("pagesToExtract") 
+            : formData.get("pagesToSplit")) as string;
 
-      if (pagesToExtract.length === 0) {
-        return { error: "Please enter valid page numbers to extract." };
+        if (!pagesInput) {
+            return { error: "Please provide page numbers or ranges." };
+        }
+        
+        const pagesToProcess = parsePageRanges(pagesInput, pageCount);
+
+      if (pagesToProcess.length === 0) {
+        return { error: "Please enter valid page numbers to process." };
       }
       
       const newDoc = await PDFDocument.create();
-      const copiedPages = await newDoc.copyPages(pdfDoc, pagesToExtract);
+      const copiedPages = await newDoc.copyPages(pdfDoc, pagesToProcess);
       copiedPages.forEach(page => newDoc.addPage(page));
       
       const pdfBytes = await newDoc.save();
+      const actionName = operation === 'extract' ? 'extracted' : 'split';
       return {
         fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
-        fileName: `extracted-${file.name}`
+        fileName: `${actionName}-${file.name}`
       };
-    }
-    
-    if (operation === 'split') {
-        const splitType = formData.get('splitType') as 'all' | 'ranges';
-
-        if (splitType === 'all') {
-            // This is a placeholder. For a real app, you'd generate a ZIP file.
-            // For now, we'll just return the first page as a demo.
-            const newDoc = await PDFDocument.create();
-            const [firstPage] = await newDoc.copyPages(pdfDoc, [0]);
-            newDoc.addPage(firstPage);
-            const pdfBytes = await newDoc.save();
-            return { 
-                error: "Splitting into individual pages currently returns the first page only. Full ZIP functionality coming soon!",
-                fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
-                fileName: `split-page-1-${file.name}`
-            };
-        }
     }
 
     if(operation === 'password') {
