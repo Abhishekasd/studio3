@@ -7,13 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Download, Loader2, Trash2, Layers, RotateCw, Scissors, Lock, Shuffle, Unlock, Hash, BadgePercent, TextQuote } from "lucide-react";
+import { Upload, Download, Loader2, Trash2, Layers, RotateCw, Scissors, Lock, Shuffle, Unlock, Hash, BadgePercent, TextQuote, Combine } from "lucide-react";
 import { processPdf } from './actions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-type Operation = "split" | "rotate" | "extract" | "rearrange" | "add-page-numbers" | "watermark" | "password" | "unlock" | "header-footer";
+type Operation = "split" | "rotate" | "extract" | "rearrange" | "add-page-numbers" | "watermark" | "password" | "unlock" | "header-footer" | "flatten";
 
 function SubmitButton({ operation }: { operation: Operation }) {
   const { pending } = useFormStatus();
@@ -26,7 +26,8 @@ function SubmitButton({ operation }: { operation: Operation }) {
       rearrange: <Shuffle className="mr-2 h-4 w-4" />,
       unlock: <Unlock className="mr-2 h-4 w-4" />,
       'add-page-numbers': <Hash className="mr-2 h-4 w-4" />,
-      'header-footer': <TextQuote className="mr-2 h-4 w-4" />
+      'header-footer': <TextQuote className="mr-2 h-4 w-4" />,
+      flatten: <Combine className="mr-2 h-4 w-4" />,
   }
   const text = {
       split: 'Split PDF',
@@ -37,7 +38,8 @@ function SubmitButton({ operation }: { operation: Operation }) {
       rearrange: 'Rearrange PDF',
       unlock: 'Unlock PDF',
       'add-page-numbers': 'Add Page Numbers',
-      'header-footer': 'Add Header/Footer'
+      'header-footer': 'Add Header/Footer',
+      flatten: 'Flatten PDF',
   }
   return (
     <Button type="submit" disabled={pending} className="w-full">
@@ -133,7 +135,7 @@ export default function PdfEditorPage() {
 
                 {selectedFile && (
                     <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as Operation)} className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
+                        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-5">
                             <TabsTrigger value="split">Split</TabsTrigger>
                             <TabsTrigger value="rotate">Rotate</TabsTrigger>
                             <TabsTrigger value="extract">Extract</TabsTrigger>
@@ -143,6 +145,7 @@ export default function PdfEditorPage() {
                             <TabsTrigger value="password">Password</TabsTrigger>
                             <TabsTrigger value="unlock">Unlock</TabsTrigger>
                             <TabsTrigger value="header-footer">Header/Footer</TabsTrigger>
+                            <TabsTrigger value="flatten">Flatten</TabsTrigger>
                         </TabsList>
                         <input type="hidden" name="operation" value={activeTab} />
                         
@@ -243,6 +246,13 @@ export default function PdfEditorPage() {
                             </div>
                            <p className="text-xs text-muted-foreground text-center">Leave fields blank that you don't need.</p>
                            <SubmitButton operation="header-footer" />
+                        </TabsContent>
+                        
+                        <TabsContent value="flatten" className="space-y-4 pt-4">
+                           <div className="text-center">
+                             <p className="text-sm text-muted-foreground">This will merge all form fields into the document, making them non-editable.</p>
+                           </div>
+                           <SubmitButton operation="flatten" />
                         </TabsContent>
 
                     </Tabs>

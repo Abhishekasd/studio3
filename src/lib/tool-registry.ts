@@ -50,6 +50,7 @@ import {
   Unlock,
   TextQuote,
   Info,
+  Combine,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -177,7 +178,7 @@ const allTools: Tool[] = [
     id: "pdf-editor",
     name: "PDF Editor",
     slug: "pdf-editor",
-    description: "Split, rotate, extract pages, rearrange, add page numbers, watermarks, headers, footers, and manage passwords.",
+    description: "Split, rotate, extract pages, rearrange, add page numbers, watermarks, flatten, headers, footers, and manage passwords.",
     category: "PDF Tools",
     categorySlug: "pdf-tools",
     href: "/tools/pdf-editor",

@@ -63,7 +63,7 @@ function parsePageOrder(orderStr: string, maxPages: number): number[] | { error:
 
 export async function processPdf(prevState: any, formData: FormData): Promise<PdfEditorState> {
   const file = formData.get("pdf") as File;
-  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange" | "unlock" | "add-page-numbers" | "header-footer";
+  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange" | "unlock" | "add-page-numbers" | "header-footer" | "flatten";
   
   if (!file || file.size === 0) {
     return { error: "Please select a PDF file." };
@@ -97,6 +97,16 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
     
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const pageCount = pdfDoc.getPageCount();
+    
+    if (operation === 'flatten') {
+        const form = pdfDoc.getForm();
+        form.flatten();
+        const pdfBytes = await pdfDoc.save();
+        return {
+            fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
+            fileName: `flattened-${file.name}`
+        };
+    }
 
      if (operation === 'header-footer') {
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
