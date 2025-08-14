@@ -692,5 +692,3 @@ export async function getTools(): Promise<Tool[]> {
 export async function getToolCategories(): Promise<ToolCategory[]> {
   return Promise.resolve(toolCategories);
 }
-
-    
