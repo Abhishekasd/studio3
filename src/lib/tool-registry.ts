@@ -129,7 +129,7 @@ const allTools: Tool[] = [
     id: "pdf-editor",
     name: "PDF Editor",
     slug: "pdf-editor",
-    description: "Split, rotate, extract pages, add watermarks, and password-protect PDFs.",
+    description: "Split, rotate, extract, rearrange pages, and add watermarks or passwords.",
     category: "PDF Tools",
     categorySlug: "pdf-tools",
     href: "/tools/pdf-editor",

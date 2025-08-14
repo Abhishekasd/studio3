@@ -7,13 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Download, Loader2, Trash2, Layers, RotateCw, Scissors, AppWindow, Lock, BadgePercent } from "lucide-react";
+import { Upload, Download, Loader2, Trash2, Layers, RotateCw, Scissors, AppWindow, Lock, BadgePercent, Shuffle } from "lucide-react";
 import { processPdf } from './actions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-type Operation = "split" | "rotate" | "extract" | "password" | "watermark";
+type Operation = "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange";
 
 function SubmitButton({ operation }: { operation: Operation }) {
   const { pending } = useFormStatus();
@@ -23,6 +23,7 @@ function SubmitButton({ operation }: { operation: Operation }) {
       extract: <Scissors className="mr-2 h-4 w-4" />,
       password: <Lock className="mr-2 h-4 w-4" />,
       watermark: <BadgePercent className="mr-2 h-4 w-4" />,
+      rearrange: <Shuffle className="mr-2 h-4 w-4" />,
   }
   const text = {
       split: 'Split PDF',
@@ -30,6 +31,7 @@ function SubmitButton({ operation }: { operation: Operation }) {
       extract: 'Extract Pages',
       password: 'Add Password',
       watermark: 'Add Watermark',
+      rearrange: 'Rearrange PDF',
   }
   return (
     <Button type="submit" disabled={pending} className="w-full">
@@ -125,10 +127,11 @@ export default function PdfEditorPage() {
 
                 {selectedFile && (
                     <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as Operation)} className="w-full">
-                        <TabsList className="grid w-full grid-cols-3">
+                        <TabsList className="grid w-full grid-cols-4">
                             <TabsTrigger value="split">Split</TabsTrigger>
                             <TabsTrigger value="rotate">Rotate</TabsTrigger>
                             <TabsTrigger value="extract">Extract</TabsTrigger>
+                            <TabsTrigger value="rearrange">Rearrange</TabsTrigger>
                         </TabsList>
                          <TabsList className="grid w-full grid-cols-2 mt-2">
                             <TabsTrigger value="password">Add Password</TabsTrigger>
@@ -169,6 +172,15 @@ export default function PdfEditorPage() {
                                <p className="text-xs text-muted-foreground">Enter page numbers or ranges, separated by commas.</p>
                            </div>
                             <SubmitButton operation="extract" />
+                        </TabsContent>
+                        
+                        <TabsContent value="rearrange" className="space-y-4 pt-4">
+                           <div className="grid gap-2">
+                               <Label htmlFor="pageOrder">New Page Order</Label>
+                               <Input name="pageOrder" id="pageOrder" placeholder="e.g., 3, 1, 2, 4" required/>
+                               <p className="text-xs text-muted-foreground">Enter all page numbers in the desired new order, separated by commas.</p>
+                           </div>
+                            <SubmitButton operation="rearrange" />
                         </TabsContent>
 
                          <TabsContent value="password" className="space-y-4 pt-4">

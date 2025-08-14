@@ -36,10 +36,34 @@ function parsePageRanges(rangeStr: string, maxPages: number): number[] {
   return Array.from(pages).sort((a, b) => a - b);
 }
 
+// Helper function to parse a page order like "3,1,2,4"
+function parsePageOrder(orderStr: string, maxPages: number): number[] | { error: string } {
+    const pages = orderStr.split(',').map(s => parseInt(s.trim(), 10));
+    const seen = new Set<number>();
+
+    if (pages.some(p => isNaN(p) || p <= 0 || p > maxPages)) {
+        return { error: `Invalid page number found. Please only use numbers between 1 and ${maxPages}.` };
+    }
+    
+    for (const page of pages) {
+        if (seen.has(page)) {
+            return { error: `Page number ${page} is duplicated in the order.` };
+        }
+        seen.add(page);
+    }
+    
+    // Optional: Check if all pages are included. For rearranging, they should be.
+    // if (seen.size !== maxPages) {
+    //     return { error: `You must include all ${maxPages} page numbers in the new order.` };
+    // }
+    
+    return pages.map(p => p - 1); // convert to 0-based index
+}
+
 
 export async function processPdf(prevState: any, formData: FormData): Promise<PdfEditorState> {
   const file = formData.get("pdf") as File;
-  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark";
+  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange";
   
   if (!file || file.size === 0) {
     return { error: "Please select a PDF file." };
@@ -52,6 +76,27 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
     const arrayBuffer = await file.arrayBuffer();
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const pageCount = pdfDoc.getPageCount();
+
+    if (operation === 'rearrange') {
+        const pageOrderInput = formData.get("pageOrder") as string;
+        if (!pageOrderInput) {
+            return { error: "Please provide the new page order." };
+        }
+        const pagesToProcess = parsePageOrder(pageOrderInput, pageCount);
+        if ('error' in pagesToProcess) {
+            return { error: pagesToProcess.error };
+        }
+
+        const newDoc = await PDFDocument.create();
+        const copiedPages = await newDoc.copyPages(pdfDoc, pagesToProcess);
+        copiedPages.forEach(page => newDoc.addPage(page));
+        
+        const pdfBytes = await newDoc.save();
+        return {
+            fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
+            fileName: `rearranged-${file.name}`
+        };
+    }
 
     if (operation === 'rotate') {
       const rotation = parseInt(formData.get("rotation") as string, 10);
