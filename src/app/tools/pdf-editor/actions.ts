@@ -63,7 +63,7 @@ function parsePageOrder(orderStr: string, maxPages: number): number[] | { error:
 
 export async function processPdf(prevState: any, formData: FormData): Promise<PdfEditorState> {
   const file = formData.get("pdf") as File;
-  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange";
+  const operation = formData.get("operation") as "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange" | "unlock";
   
   if (!file || file.size === 0) {
     return { error: "Please select a PDF file." };
@@ -74,6 +74,27 @@ export async function processPdf(prevState: any, formData: FormData): Promise<Pd
 
   try {
     const arrayBuffer = await file.arrayBuffer();
+    
+    if (operation === 'unlock') {
+        const password = formData.get("password") as string;
+        if (!password) {
+            return { error: "Please provide the password to unlock the PDF." };
+        }
+        try {
+            const pdfDoc = await PDFDocument.load(arrayBuffer, { password });
+            const pdfBytes = await pdfDoc.save();
+             return {
+                fileDataUri: `data:application/pdf;base64,${Buffer.from(pdfBytes).toString('base64')}`,
+                fileName: `unlocked-${file.name}`
+            };
+        } catch (e: any) {
+             if (e.message.includes('password')) {
+                return { error: "Incorrect password. Failed to unlock the PDF." };
+            }
+            throw e; // Re-throw other errors
+        }
+    }
+    
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const pageCount = pdfDoc.getPageCount();
 

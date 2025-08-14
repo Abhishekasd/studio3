@@ -7,13 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Download, Loader2, Trash2, Layers, RotateCw, Scissors, AppWindow, Lock, BadgePercent, Shuffle } from "lucide-react";
+import { Upload, Download, Loader2, Trash2, Layers, RotateCw, Scissors, AppWindow, Lock, BadgePercent, Shuffle, Unlock } from "lucide-react";
 import { processPdf } from './actions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-type Operation = "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange";
+type Operation = "split" | "rotate" | "extract" | "password" | "watermark" | "rearrange" | "unlock";
 
 function SubmitButton({ operation }: { operation: Operation }) {
   const { pending } = useFormStatus();
@@ -24,6 +24,7 @@ function SubmitButton({ operation }: { operation: Operation }) {
       password: <Lock className="mr-2 h-4 w-4" />,
       watermark: <BadgePercent className="mr-2 h-4 w-4" />,
       rearrange: <Shuffle className="mr-2 h-4 w-4" />,
+      unlock: <Unlock className="mr-2 h-4 w-4" />,
   }
   const text = {
       split: 'Split PDF',
@@ -32,6 +33,7 @@ function SubmitButton({ operation }: { operation: Operation }) {
       password: 'Add Password',
       watermark: 'Add Watermark',
       rearrange: 'Rearrange PDF',
+      unlock: 'Unlock PDF',
   }
   return (
     <Button type="submit" disabled={pending} className="w-full">
@@ -133,9 +135,10 @@ export default function PdfEditorPage() {
                             <TabsTrigger value="extract">Extract</TabsTrigger>
                             <TabsTrigger value="rearrange">Rearrange</TabsTrigger>
                         </TabsList>
-                         <TabsList className="grid w-full grid-cols-2 mt-2">
+                         <TabsList className="grid w-full grid-cols-3 mt-2">
                             <TabsTrigger value="password">Add Password</TabsTrigger>
                             <TabsTrigger value="watermark">Add Watermark</TabsTrigger>
+                            <TabsTrigger value="unlock">Unlock</TabsTrigger>
                         </TabsList>
                         <input type="hidden" name="operation" value={activeTab} />
                         
@@ -185,11 +188,20 @@ export default function PdfEditorPage() {
 
                          <TabsContent value="password" className="space-y-4 pt-4">
                            <div className="grid gap-2">
-                               <Label htmlFor="password">Password</Label>
+                               <Label htmlFor="password">New Password</Label>
                                <Input name="password" id="password" type="password" placeholder="Enter a strong password" required/>
                                <p className="text-xs text-muted-foreground">The password will be required to open the PDF.</p>
                            </div>
                             <SubmitButton operation="password" />
+                        </TabsContent>
+                        
+                        <TabsContent value="unlock" className="space-y-4 pt-4">
+                           <div className="grid gap-2">
+                               <Label htmlFor="unlock-password">Current Password</Label>
+                               <Input name="password" id="unlock-password" type="password" placeholder="Enter the current password" required/>
+                               <p className="text-xs text-muted-foreground">The current password is required to remove encryption.</p>
+                           </div>
+                            <SubmitButton operation="unlock" />
                         </TabsContent>
 
                          <TabsContent value="watermark" className="space-y-4 pt-4">
