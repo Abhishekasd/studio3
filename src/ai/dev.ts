@@ -5,3 +5,4 @@ import '@/ai/flows/generate-meta-tags.ts';
 import '@/ai/flows/text-to-speech.ts';
 import '@/ai/flows/remove-image-background.ts';
 import '@/ai/flows/plagiarism-checker.ts';
+import '@/ai/flows/pdf-ocr.ts';

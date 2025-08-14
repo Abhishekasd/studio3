@@ -46,6 +46,7 @@ import {
   Camera,
   FileCode,
   Edit,
+  Scan,
 } from "lucide-react";
 
 // Define interfaces for our data structures
@@ -126,6 +127,21 @@ const toolCategories: ToolCategory[] = [
 ];
 
 const allTools: Tool[] = [
+  {
+    id: 'pdf-ocr',
+    name: 'PDF OCR',
+    slug: 'pdf-ocr',
+    description: 'Extract text from scanned PDFs using AI-powered OCR.',
+    category: 'AI Tools',
+    categorySlug: 'ai-tools',
+    href: '/tools/pdf-ocr',
+    icon: Scan,
+    ai_powered: true,
+    is_featured: true,
+    popularity_score: 100,
+    created_at: new Date('2024-09-08T10:00:00Z'),
+    last_updated: new Date('2024-09-08T10:00:00Z'),
+  },
   {
     id: 'pdf-form-filler',
     name: 'PDF Form Filler',
