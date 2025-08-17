@@ -136,7 +136,7 @@ export function PdfEditorClient() {
 
               {selectedFile && (
                   <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as Operation)} className="w-full">
-                      <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-5">
+                      <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 h-auto">
                           <TabsTrigger value="split">Split</TabsTrigger>
                           <TabsTrigger value="rotate">Rotate</TabsTrigger>
                           <TabsTrigger value="extract">Extract</TabsTrigger>

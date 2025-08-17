@@ -113,6 +113,14 @@ export default function Header() {
                   <Logo className="h-8 w-8 text-primary" />
                   <span className="text-xl font-bold">MultiToolVerse</span>
                 </Link>
+                 <div className="relative mb-8">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input
+                    type="search"
+                    placeholder="Search for a tool..."
+                    className="pl-10 w-full"
+                    />
+                </div>
                 <nav className="flex flex-col gap-4 mb-8">
                   {navItems.map((item) => (
                     <Link
@@ -124,7 +132,7 @@ export default function Header() {
                     </Link>
                   ))}
                 </nav>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 border-t pt-6">
                   {user ? (
                     <Button onClick={signOut}>Log Out</Button>
                   ) : (
